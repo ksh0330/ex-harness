@@ -1,5 +1,6 @@
 import hashlib
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -59,6 +60,14 @@ class InstallTests(unittest.TestCase):
         self.assertTrue((self.target / "AGENTS.md").is_file())
         self.assertFalse((self.target / ".harness/kit").exists())
         self.assertFalse((self.target / "docs").exists())
+
+    def test_installed_guides_have_resolvable_local_links(self):
+        result = self.run_install("--apply")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for path in (self.target / ".harness").rglob("*.md"):
+            for link in re.findall(r"!?\[[^\]]*\]\(([^)]+)\)", path.read_text(encoding="utf-8-sig")):
+                if "://" not in link and not link.startswith("#"):
+                    self.assertTrue((path.parent / link.split("#", 1)[0]).exists(), f"{path.name}: {link}")
 
     def test_preflight_rejects_blocked_parent_without_partial_install(self):
         self.target.mkdir()

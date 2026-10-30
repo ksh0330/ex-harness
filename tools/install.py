@@ -30,15 +30,20 @@ def plan(target, with_examples=False):
         raise ValueError("target must be a directory")
     pairs = [(SOURCE / "AGENTS.md", target / "AGENTS.md"),
              (SOURCE / "AGENTS.md", target / ".harness/AGENTS.md"),
-             (SOURCE / "README.md", target / ".harness/GUIDE.md")]
+             (SOURCE / "templates/GUIDE.md", target / ".harness/GUIDE.md")]
     for src in sorted((SOURCE / "templates").rglob("*")):
-        if src.is_file():
+        if src.is_file() and src.name != "GUIDE.md":
             pairs.append((src, target / ".harness/templates" / src.relative_to(SOURCE / "templates")))
     # Only operational guides belong in a target project, not this repo's status.
-    for name in ("QUICKSTART.md", "MANUAL.md", "ARCHITECTURE.md", "SIMULATION.md", "SOURCES.md"):
+    for name in ("QUICKSTART.md", "MANUAL.md", "ARCHITECTURE.md", "SIMULATION.md", "SOURCES.md", "VERIFICATION.md"):
         src = SOURCE / "docs" / name
         if src.is_file():
             pairs.append((src, target / ".harness/docs" / name))
+    for folder, destination in ((SOURCE / "docs/assets", target / ".harness/docs/assets"),
+                                (SOURCE / "examples/tasks", target / ".harness/examples/tasks")):
+        for src in sorted(folder.rglob("*")):
+            if src.is_file():
+                pairs.append((src, destination / src.relative_to(folder)))
     for skill in sorted((SOURCE / "skills").iterdir()):
         dest = target / ".agents/skills" / skill.name
         plain_path(dest)

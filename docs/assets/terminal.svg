@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="440" viewBox="0 0 1040 440" role="img" aria-labelledby="title desc">
+<title id="title">Bash와 Codex 입력 위치</title><desc id="desc">실제 화면이 아닌 학습용 가상 터미널. 왼쪽은 운영체제 명령, 오른쪽은 Codex 대화 명령이다.</desc>
+<rect width="1040" height="440" rx="16" fill="#eef3f7"/>
+<g font-family="Segoe UI,Malgun Gothic,sans-serif">
+<text x="30" y="42" font-size="23" fill="#17334c">가상 화면 · 명령을 어디에 입력하는지 구분하세요</text>
+<rect x="25" y="65" width="480" height="325" rx="12" fill="#122333"/>
+<rect x="535" y="65" width="480" height="325" rx="12" fill="#122333"/>
+<g font-size="18" fill="#c9dbea"><text x="45" y="100">터미널 1 · Bash</text><text x="555" y="100">codex 실행 후 · 대화 입력창</text></g>
+<g font-family="Consolas,monospace" font-size="18" fill="#9fe3c2">
+<text x="45" y="150">$ pwd</text><text x="45" y="218">$ git status --short</text><text x="45" y="286">$ codex</text>
+<text x="555" y="150">› /status</text><text x="555" y="218">› /skills</text><text x="555" y="286">› $verify</text>
+</g>
+<g font-size="16" fill="#d1deea"><text x="45" y="179">/workspace/task (예시)</text><text x="45" y="247">M src/app.py (예시)</text><text x="45" y="315">오른쪽의 대화 화면으로 진입</text><text x="555" y="179">모델·폴더·문맥 확인</text><text x="555" y="247">필요한 스킬 선택</text><text x="555" y="315">수용 기준을 현재 실행 근거와 대조</text></g>
+<text x="30" y="420" font-size="17" fill="#17334c">서버는 별도 터미널에서 실행 · /명령을 Bash에 입력하지 않기</text>
+</g></svg>
