@@ -1,6 +1,6 @@
 # 진행 상태
 
-현재 단계: P3 설치·운영 기반 검증
+현재 단계: P4 공통 코어·웹/배치 흐름 구현
 작업 기준일: 2026-10-31 (Asia/Seoul)
 환경: Windows Work, Python 3.12.10, Git Bash 5.2.37, Codex CLI 0.165.0
 Cofa 실제 실행: 미검증
@@ -12,6 +12,7 @@ Cofa 실제 실행: 미검증
 | P1 조사 | 최초 커밋 `81aad65`, 12개 파일 조사. 사용자 변경 없음 | 범위는 첨부 요청. 실행 코드·테스트 없음. Cofa 기능은 미확인 |
 | P2 설계 | AGREEMENT·DECISIONS 작성. 첨부 요청의 자율 실행 위임으로 진행 | 거대 프레임워크 제외. 성공 수치는 목표이며 기존 성과로 표시하지 않음. 실제 학습·Cofa 수용은 사용자 확인 필요 |
 | P3 기반 | 설치기·스킬 정비. `python -m unittest discover -s tests -v`: 7 tests OK. Bash 문법·check_repo 오류 0 | 기존 Bash의 preview 쓰기 실패를 재현한 후 교체. 링크 경로·기존 파일 보존 확인. 공식 skill validator는 PyYAML 부재로 미실행 |
+| P4 흐름 | 공통 레코드 검증·SQLite·검색·상태 전환을 실제 HTTP/CSV CLI에서 사용 | 오류 주입 테스트 두 곳의 SQLite 연결 미종료를 발견. 가설 2개 보고 후 명시적 close로 관련 database 테스트 3개 OK. UI 조작·Cofa는 미검증 |
 
 ## 다음 slice
 

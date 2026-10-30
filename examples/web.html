@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>동네 수리 접수 연습</title>
+<style>
+body{font:16px system-ui;max-width:760px;margin:48px auto;padding:0 20px;color:#182b3a;background:#f6f8fa}
+h1{font-size:28px}form,.filters{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}input,select,button{font:inherit;padding:9px;border:1px solid #9aabb8;border-radius:6px}button{cursor:pointer;background:#fff}input{flex:1}li{display:flex;align-items:center;gap:12px;background:white;padding:14px;margin:8px 0;border-radius:8px}li span{flex:1;overflow-wrap:anywhere}ul{padding:0;list-style:none}#message{min-height:24px;color:#9e281b}.muted{color:#526878}
+</style>
+<h1>동네 수리 접수</h1>
+<p class="muted">접수 → 처리 중 → 완료. 합성 데이터로 연습하세요.</p>
+<form id="create"><label for="title">수리 내용</label><input id="title" required maxlength="200" placeholder="예: 자전거 브레이크 조정"><button>등록</button></form>
+<form id="filters"><label for="query">검색</label><input id="query" maxlength="200"><select id="status" aria-label="상태"><option value="">모든 상태</option><option value="open">접수</option><option value="active">처리 중</option><option value="done">완료</option></select><select id="order" aria-label="정렬"><option value="id">접수 순</option><option value="title">제목 순</option></select><button>조회</button></form>
+<p id="summary" class="muted"></p><p id="message" role="status" aria-live="polite"></p><ul id="items"></ul>
+<button id="prev" type="button">이전</button> <span id="page"></span> <button id="next" type="button">다음</button>
+<script>
+const $ = id => document.getElementById(id);
+const labels = {open:'접수',active:'처리 중',done:'완료'};
+let offset = 0;
+async function api(path, method='GET', body) {
+  const response = await fetch(path, {method, headers:body?{'Content-Type':'application/json'}:{}, body:body?JSON.stringify(body):undefined});
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || '요청 실패');
+  return data;
+}
+async function load() {
+  try {
+    const params = new URLSearchParams({q:$('query').value,order:$('order').value,limit:10,offset});
+    if ($('status').value) params.set('status',$('status').value);
+    const [data, counts] = await Promise.all([api('/api/items?'+params),api('/api/summary')]);
+    $('items').replaceChildren();
+    for (const record of data.items) {
+      const row=document.createElement('li'), text=document.createElement('span');
+      text.textContent=record.title+' · '+labels[record.status]; row.append(text);
+      if (record.status!=='done') {
+        const button=document.createElement('button'); button.textContent=record.status==='open'?'처리 시작':'완료 처리';
+        button.onclick=async()=>{try{await api('/api/items/'+record.id,'PATCH',{status:record.status==='open'?'active':'done'});await load()}catch(e){$('message').textContent=e.message}};
+        row.append(button);
+      }
+      $('items').append(row);
+    }
+    $('summary').textContent='전체: 접수 '+counts.open+' / 처리 중 '+counts.active+' / 완료 '+counts.done;
+    $('page').textContent=Math.floor(offset/10)+1+' 페이지';
+    $('prev').disabled=offset===0; $('next').disabled=data.items.length<10;
+    $('message').textContent=data.items.length?'':'검색 결과가 없습니다.';
+  } catch(e) { $('message').textContent=e.message; }
+}
+$('create').onsubmit=async e=>{e.preventDefault();try{await api('/api/items','POST',{title:$('title').value});$('title').value='';offset=0;await load()}catch(e){$('message').textContent=e.message}};
+$('filters').onsubmit=e=>{e.preventDefault();offset=0;load()};
+$('prev').onclick=()=>{offset=Math.max(0,offset-10);load()};$('next').onclick=()=>{offset+=10;load()};load();
+</script>
+</html>

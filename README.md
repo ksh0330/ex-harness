@@ -28,6 +28,27 @@ Python 3.10+가 필요하다. 설치기는 패키지를 설치하지 않고 네�
 
 ## 개발·검증
 
+저장소 루트에서 웹 연습 서버를 실행한다. 사용자가 별도 터미널에서 계속 실행한다.
+
+```bash
+python -m examples.web --db .run/repairs.sqlite3 --port 8000
+```
+
+출력은 `Listening on 0.0.0.0:8000`. 로컬 브라우저는 `http://localhost:8000`, IDE 미리보기는 실제 출력된 포트와 `/`를 지정한다.
+등록 → 검색 → 처리 시작 → 완료를 확인한다. 인증 없는 연습 서버이므로 실제 개인정보를 넣지 않는다.
+
+별도의 비웹 예제는 자료 보관 CSV를 같은 검증·SQLite 코어로 처리한다.
+
+```bash
+python -m examples.batch import examples/data/archive.csv --db .run/archive.sqlite3
+python -m examples.batch export --db .run/archive.sqlite3
+```
+
+첫 명령은 `{"imported": 3}`, 두 번째는 레코드와 상태별 집계를 JSON으로 출력한다.
+재수입은 새 레코드를 추가한다. 중복 제거는 구현하지 않았다. `--output 새파일.json`은 기존 파일을 덮어쓰지 않는다.
+대상 프로젝트에 예제가 필요하면 설치 시 `--with-examples`를 추가하고 `.harness/kit`에서 위 명령을 실행한다.
+이 선택을 하지 않으면 대상 앱 코드·DB는 설치하지 않는다.
+
 ```bash
 python -m unittest discover -s tests -v
 python tools/check_repo.py
