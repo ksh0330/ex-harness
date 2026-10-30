@@ -1,6 +1,7 @@
 # 직접 운용하는 매뉴얼
 
 읽는 순서: [빠른 시작](QUICKSTART.md) → 이 문서의 입력 위치·한 흐름 실습 → [구조](ARCHITECTURE.md) → [35분 모의시험](SIMULATION.md).
+용어가 대부분 낯설면 [처음 쓰는 사람 설명](BASICS.md)부터 읽는다. 긴 실습·모의시험은 선택 사항이다.
 문서의 **가상 출력**은 화면 모양을 설명하기 위한 예시다. 이번 실제 결과는 [검증 기록](VERIFICATION.md), 공식 지원 근거는 [SOURCES](SOURCES.md)에 있다.
 
 ## 1. Bash와 Codex 입력창

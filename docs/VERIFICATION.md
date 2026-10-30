@@ -74,7 +74,7 @@ git diff --check
 | 설치 계획·경로 사전 검사 | tools/install.py:24 |
 | preview·명시적 적용·기존 파일 보존 | tools/install.py:74, tests/test_install.py:29, tests/test_install.py:35 |
 | 설치된 가이드 링크 | tests/test_install.py:64 |
-| 링크 이탈 차단 | tests/test_install.py:88 |
+| 링크 이탈 차단 | tests/test_install.py:90 |
 | 공통 입력 검사·일괄 저장·상태·검색 | fde/records.py:26, fde/records.py:64, fde/records.py:81, fde/records.py:94 |
 | 실제 HTTP와 CLI의 같은 데이터 사용 | tests/test_examples.py:56 |
 | 실제 서버 명령·0.0.0.0·배정 포트·health | tests/test_examples.py:174 |
@@ -110,3 +110,13 @@ git diff --check
 - 전체 24개 결과는 위의 이전 전체 실행 기록이다. 이번 변경에는 설치 관련 8개와 문서/스킬 검사를 적용했다.
 - GitHub 연결의 저장소 metadata: public, 기본 브랜치 main 확인. Notion 개인 페이지 생성 후 읽어 날짜·용어·명령·핵심 후기·코드 블록 저장을 확인했다.
 - 실제 Cofa 실행·사용자 학습·35분 모의시험은 아직 검증하지 않았다. 시간 제약을 수용 완료로 바꾸지 않는다.
+
+## 초보자용 사용 안내 개정
+
+- 사용자 수준에 맞춰 BASICS에 입력 위치·여섯 핵심말·주문→제작→확인 흐름·질문 문장·나머지 용어 풀이를 작성했다.
+- AGENTS에 처음 쓰는 용어를 뜻·예·행동으로 설명하는 규칙을 추가했다. Notion은 핵심 용어와 결과 판단을 먼저, 나머지 사전은 접어서 보도록 변경했다.
+- 새 PC 설치·시작 절차는 추가하지 않았다. 저장소가 열린 준비용 Codex 새 대화 프롬프트 한 개를 포함하고 이전 PC에 고정된 D: 경로는 제거했다.
+- Notion 읽기에서 발견한 잘못된 자동 링크 `http://install.py/install.sh`는 실제 파일 이름의 코드 표기로 수정했다.
+- `python -m unittest discover -s tests -p test_install.py -v`: **8 tests OK**, 4.521초, 종료 0. BASICS·MORNING의 설치본 내용 일치와 가이드 링크까지 검증했다.
+- `python tools/check_repo.py`: **skills=8; errors=0**, 종료 0. `git diff --check`: 공백 오류 없음, 종료 0.
+- 앱 코어는 변경하지 않았다. 사용자 직접 활용·이해도와 Cofa 현장 동작은 계속 미확인이다.

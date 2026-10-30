@@ -66,6 +66,8 @@ class InstallTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         morning = self.target / ".harness/docs/MORNING.md"
         self.assertEqual(morning.read_bytes(), (ROOT / "docs/MORNING.md").read_bytes())
+        basics = self.target / ".harness/docs/BASICS.md"
+        self.assertEqual(basics.read_bytes(), (ROOT / "docs/BASICS.md").read_bytes())
         for path in (self.target / ".harness").rglob("*.md"):
             for link in re.findall(r"!?\[[^\]]*\]\(([^)]+)\)", path.read_text(encoding="utf-8-sig")):
                 if "://" not in link and not link.startswith("#"):
