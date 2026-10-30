@@ -55,7 +55,8 @@ python tools/check_repo.py
 ```
 
 선택형 스킬 8개는 [skills](skills)에 있다. 복잡한 과제에서 필요한 스킬만 사용한다.
-처음 사용할 때는 [09:00 체크리스트·빠른 시작](docs/QUICKSTART.md) → [명령 실습 매뉴얼](docs/MANUAL.md) → [35분 모의시험](docs/SIMULATION.md) 순서로 읽는다.
+시간이 없으면 [08시 아침 요약·09시 점검](docs/MORNING.md)부터 읽는다. 용어·명령·저장소 구조·현장 수정 판단·복사용 프롬프트를 한곳에 모았다.
+자세한 내용은 [빠른 시작](docs/QUICKSTART.md), [명령 실습 매뉴얼](docs/MANUAL.md)을 참고한다. [35분 모의시험](docs/SIMULATION.md)은 선택 자료다.
 [구조·재사용·한계](docs/ARCHITECTURE.md), [공식 기능과 Cofa 구분](docs/SOURCES.md), [실제 검증 결과](docs/VERIFICATION.md)도 제공한다.
 현재 구현·검증 상태는 [STATUS](docs/STATUS.md), 범위는 [AGREEMENT](docs/AGREEMENT.md), 결정 이유는 [DECISIONS](docs/DECISIONS.md)를 참고한다.
 Cofa 실제 실행과 사용자의 운용 실습은 별도로 확인해야 한다.

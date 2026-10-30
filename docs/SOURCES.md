@@ -39,7 +39,14 @@ CLI help는 옵션의 존재 증거이며 모델 호출·TUI 동작·Cofa 지원
 가상 출력은 [MANUAL](MANUAL.md), 실제 실행 결과는 [VERIFICATION](VERIFICATION.md)에 구분한다.
 `learn.../extend/plugins`는 404였다. 공식 Build skills가 연결한 Package your plugin 페이지를 사용했다.
 
-## 시험 안내의 출처
+## 10/31 계획 변경에 참고한 자료
+
+- 핵심 참가 후기: [Luka의 Brunch 글](https://brunch.co.kr/@luma/5). 낯선 환경 적응·README 우선·설명과 인계를 반영했다. 다른 행사의 모델·시간·문항·배점은 적용하지 않는다.
+- [Cofa 공식 Probe](https://www.getcofa.com/ko/probe): 결과물과 과정·검증·설명을 함께 확인한다는 제품 안내. 실제 응시 규칙을 대체하지 않는다.
+- [Tistory Q&A 글](https://donggrri.tistory.com/248): 보조 해설. 일반 HTTP로 본문을 읽었다. 독립 참가 후기/이번 시험 규칙으로 사용하지 않는다.
+- 사용자 최신 확인: 학습은 10/31 08시, 사전 테스트는 09시. 긴 시뮬레이션은 선택으로 변경.
+
+### 기존 시험 안내
 
 일정(2026-10-31 10:00~14:00), 최대 과제 180분·후속 6문항 각 5분, 제공 모델과 금지 행위는 사용자가 제공한 안내다.
 이번 작업에서 주최 측 원본이나 Cofa 정책 화면을 독립 검증하지 않았다. 현장에서 최신 안내와 상충하면 현장 안내를 따른다.

@@ -74,14 +74,14 @@ git diff --check
 | 설치 계획·경로 사전 검사 | tools/install.py:24 |
 | preview·명시적 적용·기존 파일 보존 | tools/install.py:74, tests/test_install.py:29, tests/test_install.py:35 |
 | 설치된 가이드 링크 | tests/test_install.py:64 |
-| 링크 이탈 차단 | tests/test_install.py:86 |
+| 링크 이탈 차단 | tests/test_install.py:88 |
 | 공통 입력 검사·일괄 저장·상태·검색 | fde/records.py:26, fde/records.py:64, fde/records.py:81, fde/records.py:94 |
 | 실제 HTTP와 CLI의 같은 데이터 사용 | tests/test_examples.py:56 |
 | 실제 서버 명령·0.0.0.0·배정 포트·health | tests/test_examples.py:174 |
 | CSV→공통 스키마 어댑터 | examples/batch.py:15 |
 | DB 실패 중간 rollback·동시 전환 | tests/test_examples.py:144, tests/test_examples.py:152 |
 | 설치된 선택 예제 실행 | tests/test_examples.py:165 |
-| 시험 push 요청 경계·리뷰 임시 파일 경계 | AGENTS.md:32, skills/cross-review/SKILL.md:7 |
+| 시험 push 요청 경계·리뷰 임시 파일 경계 | AGENTS.md:33, skills/cross-review/SKILL.md:7 |
 
 비밀값 패턴 검사도 실행했다: 대상 코드·스킬·문서에서 API key/token·private key 대표 패턴 일치 0건. 이는 완전한 비밀값 탐지 보장이 아니다.
 공식 문서만 열었으며 신규 MCP·Hook·Plugin·개인 키를 설정하지 않았다. 테스트 서버·자식 프로세스는 각 테스트에서 종료했다.
@@ -97,3 +97,16 @@ git diff --check
 - 브라우저: 정적 HTML 응답·HTTP/DB 흐름은 검증했으나 실제 버튼 클릭·렌더링·Cofa 미리보기는 미검증이다.
 - 운영 범위: 인증·규제·실제 고객 API·대용량·일관된 export snapshot은 미구현/미검증이다.
 - 공식 skill validator: PyYAML 부재. 제한된 메타데이터 검사만 수행했다.
+
+## 10/31 아침 운용 계획 개정
+
+사용자 시간 제약에 따라 MORNING·개인 Notion 요약을 작성하고 모의시험을 선택으로 변경했다.
+핵심 참가 후기는 Brunch, 공식 제품 안내는 Cofa, Tistory는 보조 해설로 구분했다.
+앱 코어는 바꾸지 않았다. 설치기에 MORNING 복사만 추가하고 실제 파일 내용 일치·설치 링크 회귀를 확인했다.
+
+- `python -m unittest discover -s tests -p test_install.py -v`: **8 tests OK**, 3.849초, 종료 0.
+- `python tools/check_repo.py`: **skills=8; errors=0**, 종료 0.
+- `git diff --check`: 공백 오류 없음, 종료 0.
+- 전체 24개 결과는 위의 이전 전체 실행 기록이다. 이번 변경에는 설치 관련 8개와 문서/스킬 검사를 적용했다.
+- GitHub 연결의 저장소 metadata: public, 기본 브랜치 main 확인. Notion 개인 페이지 생성 후 읽어 날짜·용어·명령·핵심 후기·코드 블록 저장을 확인했다.
+- 실제 Cofa 실행·사용자 학습·35분 모의시험은 아직 검증하지 않았다. 시간 제약을 수용 완료로 바꾸지 않는다.
