@@ -79,24 +79,42 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         pairs = plan(args.target, args.with_examples)
-        created = 0
-        for src, dest in pairs:
-            if dest.exists():
-                print(f"KEEP {dest}")
-                continue
-            print(f"{'CREATE' if args.apply else 'PLAN'} {dest}")
-            if args.apply:
-                plain_path(dest)
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                with dest.open("xb") as output, src.open("rb") as source:
-                    shutil.copyfileobj(source, output)
-                created += 1
+        created = apply_plan(pairs, args.apply)
         print(f"created={created}; mode={'apply' if args.apply else 'preview'}")
         print("Existing files/skills are kept; no automatic upgrades. Read .harness/AGENTS.md explicitly when AGENTS.md already exists.")
         return 0
     except (OSError, ValueError) as exc:
         print(f"install: {exc}", file=sys.stderr)
         return 2
+
+
+def apply_plan(pairs, apply=True):
+    """Share the additive installer with bootstrap; roll back only our new files."""
+    created = []
+    try:
+        for src, dest in pairs:
+            if dest.exists():
+                print(f"KEEP {dest}")
+                continue
+            print(f"{'CREATE' if apply else 'PLAN'} {dest}")
+            if apply:
+                plain_path(dest)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                with dest.open("xb") as output:
+                    created.append(dest)
+                    with src.open("rb") as source:
+                        shutil.copyfileobj(source, output)
+        return len(created)
+    except (OSError, ValueError):
+        # An interrupted process may leave files; a normal I/O failure rolls back
+        # files created by this invocation. Empty directories may remain.
+        for dest in reversed(created):
+            try:
+                plain_path(dest)
+                dest.unlink()
+            except (OSError, ValueError) as exc:
+                print(f"rollback: {dest}: {exc}", file=sys.stderr)
+        raise
 
 
 if __name__ == "__main__":

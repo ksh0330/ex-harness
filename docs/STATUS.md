@@ -1,5 +1,18 @@
 # 진행 상태
 
+## 2026-11-05 개편 — 현재 작업
+
+현재 단계: P5 전체 회귀 완료 → P6 문서·인계 검토. 현재 범위는 AGREEMENT B1~B7.
+시작 Git 상태: clean. 기존 설치기·8개 스킬과 테스트 24개 확인.
+환경: Windows PowerShell, Python 3.12.9, Node 24.18.1, Codex CLI 0.166.0.
+초기 샌드박스 실행은 Bash DLL 초기화(3221225794), HTTP 연결(10013), junction 생성 권한으로 실패했다. 승인된 로컬 실행에서 기존 24개 통과, Bash 5.3.9 확인. Ubuntu 24.04/WSL, Python 3.12.3의 Bash·POSIX sh·PTY 확인.
+현재 전체: Windows 45개 중 40 통과·5 skip(19.416초); Ubuntu 결과는 VERIFICATION에 기록한다. check_repo skills=8/errors=0. 공식 quick_validate는 `python -X utf8`로 8개 valid(기본 cp949 실패와 구분).
+구현: 시작→환경/루트→기존 plan/apply_plan→대화형 prompt 전달, I/O rollback, 원본 Skill 대안. 현재 단계 운영·로컬 커밋·UI/알고리즘 보강·인계 지침 반영.
+남은 일: 최종 문서·diff 검토, 출력 문구 수정 관련 검증, 검증된 로컬 커밋, 최신 HANDOFF. 실제 AI·Cofa·UI·IDE 붙여넣기는 미검증. PS1은 실행 정책에 막혀 Python 직접 진입을 검증/안내한다.
+감사: 범용 설치 프레임워크·런타임 설치·외부 서비스·시험 자료 추가 없음. 실제 AI/Cofa·UI 확인을 테스트 대역과 구분한다.
+
+아래는 이전 작업 기록이며 현재 검증 증거와 구분한다.
+
 현재 단계: P7 초보자 사용 안내 전달 — 직접 활용·실제 환경은 미확인
 추가 점검(2026-10-31): MANUAL에 상황별 기능 선택·Skill 호출·역할 분리·중단/재개를 통합했다. 로컬 CLI는 0.166.0이며 resume/fork/review 옵션은 도움말로 확인했다. 아래 Python·Git Bash·CLI 0.165.0 기록은 이전 검증 환경이다. 현재 python 실행은 실패했고 대화형 명령·사용자 실습·Cofa는 미검증이다. `.agents/` 사용자 복사본은 보존하며 이번 커밋에서 제외한다. 원래 요청의 임시 프로젝트 설치·구현·방향 변경·재개 실습은 남아 있다.
 작업 기준일: 2026-10-31 (Asia/Seoul)
