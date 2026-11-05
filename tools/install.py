@@ -10,6 +10,22 @@ import sys
 SOURCE = Path(__file__).resolve().parents[1]
 
 
+def readmes(folder):
+    return sorted(p for p in folder.iterdir()
+                  if p.is_file() and (p.name.lower() == "readme" or p.name.lower().startswith("readme.")))
+
+
+def task_root(target):
+    """Use the same root boundary for direct installation and bootstrap."""
+    target = Path(os.path.abspath(target))
+    plain_path(target)
+    if target == SOURCE or SOURCE in target.parents:
+        raise ValueError("target must be the task directory, outside the harness source")
+    if not target.is_dir() or not readmes(target):
+        raise ValueError(f"target needs an existing task README directory: {target}")
+    return target
+
+
 def plain_path(path):
     """Reject symlinks and Windows junction/reparse points, including parents."""
     for part in (path, *path.parents):
@@ -22,12 +38,7 @@ def plain_path(path):
 
 
 def plan(target, with_examples=False):
-    target = Path(os.path.abspath(target))
-    plain_path(target)
-    if target == SOURCE or SOURCE in target.parents:
-        raise ValueError("target must be outside the harness source")
-    if target.exists() and not target.is_dir():
-        raise ValueError("target must be a directory")
+    target = task_root(target)
     pairs = [(SOURCE / "AGENTS.md", target / "AGENTS.md"),
              (SOURCE / "AGENTS.md", target / ".harness/AGENTS.md"),
              (SOURCE / "templates/GUIDE.md", target / ".harness/GUIDE.md")]
@@ -85,6 +96,7 @@ def main(argv=None):
         return 0
     except (OSError, ValueError) as exc:
         print(f"install: {exc}", file=sys.stderr)
+        print('Next: run from the task README directory, or use --target "<task README directory>". No git init or config changes.', file=sys.stderr)
         return 2
 
 

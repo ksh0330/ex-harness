@@ -7,67 +7,50 @@ git clone https://github.com/ksh0330/ex-harness
 sh ex-harness/start.sh
 ```
 
-시작 명령 하나가 환경·과제 루트·설치 계획을 출력하고, 없는 지침/Skill만 추가한 뒤 대화형 Codex에 P1 분석 시작 지침을 전달한다. 기존 README·AGENTS·사용자 변경·설정은 보존한다. 후보가 여러 개면 번호 또는 경로를 선택한다.
+실패 시 대체 명령(Python 3.10+):
 
-Linux Bash·POSIX `sh`(Ubuntu 24.04), Windows PowerShell의 Python 진입점을 실제 검증했다. **CLI 전달은 가짜 CLI/PTY로 검증했으며 실제 AI 대화·Skill 인식·Cofa는 미검증**이다. Python 기본 설치를 가정하지 않는다. [검증 기록](docs/VERIFICATION.md).
+```sh
+python3 ex-harness/tools/start.py
+```
 
-| 상황 | 과제 README 폴더 터미널에 입력 |
-|---|---|
-| `bash` 실행 실패, `sh` 사용 가능 | `sh ex-harness/start.sh` (두 스크립트 모두 POSIX 호환) |
-| 셸 스크립트 불가, Python 3.10+ 확인됨 | `python3 ex-harness/tools/start.py` (`python`만 확인되면 이름 교체) |
-| Windows PowerShell | `python .\ex-harness\tools\start.py` |
-| 이미 Codex가 실행 중 | 시작 명령 뒤 `--existing-session` 추가 또는 아래 문장 입력 |
+`python`만 있으면 이름을 바꾼다. Windows PowerShell에서는 `python .\ex-harness\tools\start.py`.
 
-Python이 없거나 버전이 낮으면 **파일 설치·Codex 실행 없이** 다음 대안을 출력한다. 제공된 **Codex 채팅**에 한 문장 입력한다.
+**Codex가 열리면 `/model` 또는 제공 선택 화면에서 Sol 6.1을 선택**한다. 사용자 제공 안내의 대안은 Sol 6.0·Terra 5.6·Luna 6.0이며 Astra·Claude는 금지다. 실제 제공 목록과 현장 규정이 우선이다. 시작 실패 시 과제 폴더에서 `codex` 또는 제공 Codex 채팅을 연다. 업데이트·개인 키 설정은 하지 않는다.
+
+모델 선택 후 **Codex 채팅에 최초 프롬프트 한 번** 입력한다:
 
 ```text
 과제 README와 기존 AGENTS.md를 먼저 읽고 ex-harness/AGENTS.md와 ex-harness/templates/START.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
 ```
 
-CLI가 없거나 실행 실패해도 위 문장으로 제공 채팅에서 진행한다. CLI·채팅 모두 없으면 감독자에게 제공 진입점을 문의한다. 런타임 설치·업데이트·보안 우회는 하지 않는다. 긴 요청·담당자 DM은 플랫폼 IDE 편집기에 Markdown으로 저장하고 Codex에 그 파일을 읽힌다.
+이 문장은 Python이 없어 설치하지 못해도 원본 지침을 읽는다. 이후 P1 분석부터 P7 검증·제출 점검까지 진행한다. 중요한 판단·DM 전송·실행 승인·화면 확인·세션 조작·최종 제출은 사용자가 한다. 터미널 붙여넣기는 `Ctrl+Shift+V`. 긴 요청/DM 응답은 IDE의 Markdown에 저장하고 해당 파일을 읽힌다.
+
+시작 명령은 환경·과제 루트·계획을 출력하고 없는 지침/Skill만 추가한다. 기존 README·AGENTS·코드·Git·설정은 보존한다. 현재 폴더에 README가 없고 후보가 여러 개면 경로를 선택한다. CLI·채팅이 모두 없으면 감독자에게 제공 진입점을 문의한다.
+
+**제출 주의:** 기본 배치는 과제 폴더 안에 `ex-harness/`와 그 내부 `.git`도 둔다. 전체 폴더 제출 시 이 원본도 포함되며 `.gitignore`로 제외되지 않는다. 설치기가 삭제하지 않는다. 과제 밖 형제 폴더 쓰기가 허용되고 제출 범위가 과제 폴더로 확정된 경우의 [외부 배치 명령](docs/QUICKSTART.md#clone-위치와-제출-범위)을 제공한다.
 
 ## 필요한 경우만
 
-`--preview`는 무변경 계획 확인, `--no-launch`는 설치 후 채팅용 문장 출력, `--target 경로`는 과제 루트 지정이다. 기존 `install.sh`는 계속 preview가 기본이며 `--apply`로만 쓴다. 부트스트랩은 이 설치기를 재사용한다. 추가 패키지·Hook·MCP·Plugin 없이 동작한다.
+`--preview`: 무변경 확인, `--no-launch`: 설치만, `--target 경로`: 과제 루트, `--existing-session`: 현재 Codex 유지. 정확한 **현장 허용 모델 ID**를 이미 확인했다면 `--model 실제ID`를 붙여 최초 프롬프트도 자동 전달할 수 있다. 표시 이름을 ID로 추측하지 않는다. 기본 실행은 모델 선택 전에 요청을 보내지 않는다.
 
-Skill 8개의 **파일 존재**만 확인한다. 목록에 인식되면 사용하고, 미인식이면 `.agents/skills/verify/SKILL.md`를 직접 읽힌다. 이름 충돌은 보존하며 원본 `ex-harness/skills/verify/SKILL.md`를 읽힌다. [시작 지침](templates/START.md)에 P1~P7·중요 결정·검증된 로컬 커밋·UI·알고리즘 보강·인계를 정리했다.
+기존 `install.sh`는 preview가 기본이고 `--apply`로만 쓴다. 직접 설치도 기존 과제 README 폴더만 허용한다. 추가 패키지·Hook·MCP·Plugin 없이 동작한다.
 
-낯선 용어는 [처음 쓰는 사람 설명](docs/BASICS.md), 실패 원인별 다음 행동은 [빠른 시작](docs/QUICKSTART.md)을 참고한다. 설치·시작 로직은 네트워크에 연결하지 않는다. Codex 사용은 현장에서 허용된 도구·인증만 사용한다.
+Skill 8개의 **파일 존재**만 확인한다. Codex가 단계에 맞게 선택하고 미인식이면 `.agents/skills/<이름>/SKILL.md`, 충돌이면 원본 `ex-harness/skills/<이름>/SKILL.md`를 읽는다. 기존 보조 지침 충돌도 덮어쓰지 않고 원본을 안내한다. [시작 지침](templates/START.md)에 단계·결정·검증·로컬 커밋·UI·알고리즘·마감·인계를 정리했다.
+
+Linux Bash·POSIX sh와 Windows Python을 검증했다. **실제 AI 대화·Skill 자동 호출·Hook 활성화·Cofa는 미검증**이며 CLI 인자는 가짜 CLI/PTY로 검증했다. [검증 기록](docs/VERIFICATION.md), [실패 복구](docs/QUICKSTART.md), [용어 설명](docs/BASICS.md). 설치·시작 로직은 네트워크에 연결하지 않으며 Codex는 현장 제공 도구·인증을 사용한다.
 
 ## 개발·검증
 
-저장소 루트에서 웹 연습 서버를 실행한다. 사용자가 별도 터미널에서 계속 실행한다.
+저장소 루트에서:
 
-```bash
-python -m examples.web --db .run/repairs.sqlite3 --port 8000
-```
-
-출력은 `Listening on 0.0.0.0:8000`. 로컬 브라우저는 `http://localhost:8000`, IDE 미리보기는 실제 출력된 포트와 `/`를 지정한다.
-등록 → 검색 → 처리 시작 → 완료를 확인한다. 인증 없는 연습 서버이므로 실제 개인정보를 넣지 않는다.
-
-별도의 비웹 예제는 자료 보관 CSV를 같은 검증·SQLite 코어로 처리한다.
-
-```bash
-python -m examples.batch import examples/data/archive.csv --db .run/archive.sqlite3
-python -m examples.batch export --db .run/archive.sqlite3
-```
-
-첫 명령은 `{"imported": 3}`, 두 번째는 레코드와 상태별 집계를 JSON으로 출력한다.
-재수입은 새 레코드를 추가한다. 중복 제거는 구현하지 않았다. `--output 새파일.json`은 기존 파일을 덮어쓰지 않는다.
-대상 프로젝트에 예제가 필요하면 설치 시 `--with-examples`를 추가하고 `.harness/kit`에서 위 명령을 실행한다.
-이 선택을 하지 않으면 대상 앱 코드·DB는 설치하지 않는다.
-
-```bash
+```sh
 python -m unittest discover -s tests -v
 python tools/check_repo.py
 ```
 
-선택형 스킬 8개는 [skills](skills)에 있다. 복잡한 과제에서 필요한 스킬만 사용한다.
-시간이 없으면 [08시 아침 요약·09시 점검](docs/MORNING.md)부터 읽는다. 용어·명령·저장소 구조·현장 수정 판단·복사용 프롬프트를 한곳에 모았다.
-자세한 내용은 [빠른 시작](docs/QUICKSTART.md), [명령 실습 매뉴얼](docs/MANUAL.md)을 참고한다. [35분 모의시험](docs/SIMULATION.md)은 선택 자료다.
-[구조·재사용·한계](docs/ARCHITECTURE.md), [공식 기능과 Cofa 구분](docs/SOURCES.md), [실제 검증 결과](docs/VERIFICATION.md)도 제공한다.
-현재 구현·검증 상태는 [STATUS](docs/STATUS.md), 범위는 [AGREEMENT](docs/AGREEMENT.md), 결정 이유는 [DECISIONS](docs/DECISIONS.md)를 참고한다.
-Cofa 실제 실행과 사용자의 운용 실습은 별도로 확인해야 한다.
+선택 연습 예제는 `python -m examples.web --db .run/repairs.sqlite3 --port 8000` 또는 `python -m examples.batch import examples/data/archive.csv --db .run/archive.sqlite3`다. 웹은 `0.0.0.0:8000`을 출력하며 사용자가 별도 터미널에서 실행한다. 인증 없는 합성 연습용이므로 실제 개인정보를 넣지 않는다. 대상 과제에는 `--with-examples` 선택 설치 시에만 `.harness/kit`에 복사한다.
+
+자세한 사용은 [매뉴얼](docs/MANUAL.md), [구조·한계](docs/ARCHITECTURE.md), [공식 기능과 현장 구분](docs/SOURCES.md). 현재 [범위](docs/AGREEMENT.md)·[상태](docs/STATUS.md)·[결정](docs/DECISIONS.md)을 기록한다. [이전 아침 연습](docs/MORNING.md)과 [35분 모의시험](docs/SIMULATION.md)은 선택 자료다.
 
 ## 제한 환경
 

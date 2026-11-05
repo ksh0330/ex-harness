@@ -2,6 +2,8 @@
 
 현재 시작 방식(2026-11-05): 과제 README 폴더 터미널에서 `git clone https://github.com/ksh0330/ex-harness`, 이어서 `sh ex-harness/start.sh`. 하네스 폴더 안으로 이동하지 않는다. 설치는 없는 지침만 추가하고 기존 설치기를 재사용한다. Python 3.10+가 없으면 짧은 직접 지시로 진행한다.
 
+기본 시작은 대화형 Codex만 연다. `/model` 또는 제공 선택 화면에서 허용 모델을 선택한 뒤 아래 문장을 한 번 입력한다. 사용자 제공 권장 모델은 Sol 6.1, 대안 Sol 6.0·Terra 5.6·Luna 6.0이며 Astra·Claude 금지다. 정확한 현장 허용 ID를 이미 확인한 경우에만 시작 명령에 `--model 실제ID`를 붙여 공식 `codex --model ID [PROMPT]`로 자동 전달한다. 표시 이름과 API/CLI ID를 추측하지 않는다. 현장 `--help`에 옵션이 없으면 채팅 대안으로 전환하며 버전/승인 설정을 바꾸지 않는다.
+
 실제 검증은 Ubuntu Bash·POSIX sh, Windows PowerShell/Python, 가짜 CLI의 인자 전달까지다. 실제 AI 대화·Skill 인식·Cofa 통과를 의미하지 않는다. [상세 증거](VERIFICATION.md).
 
 ## 실행 전 실제 환경
@@ -24,6 +26,8 @@ command -v codex
 | `sh`도 불가 | 확인된 Python 3.10+로 `python3 ex-harness/tools/start.py`. Windows PowerShell은 `python .\ex-harness\tools\start.py` |
 | Python 없음·낮음·실행 실패 | 자동 선택은 python3→python 순서로 버전을 검사한다. 모두 실패하면 설치하지 않고 아래 Codex 문장 출력. 런타임을 설치하지 않는다 |
 | 과제 루트 후보 여러 개/없음 | 번호/README 폴더 경로 선택. 비대화형은 추측하지 않고 `--target` 요구. target은 존재하는 README 폴더여야 함 |
+| 잘못 선택한 루트 | 과제 README 폴더로 돌아가 `python3 ex-harness/tools/start.py --target .` 실행. 현재 cwd에 README가 있으면 그 폴더를 우선함. 직접 install도 README 없는 폴더에 설치하지 않음 |
+| 기존 `.harness` 또는 Skill 충돌 | 기존 파일을 유지하고 출력한 현재 원본 경로를 읽음. 자동 삭제/덮어쓰기 없음 |
 | Codex 없음·help 실패·실행 오류 | 실패 명령/종료 코드를 보존하고 제공 채팅에 아래 한 문장. 자동 재시도·exec 전환 없음 |
 | 설치 중 I/O 오류 | Codex 시작 금지. 이번 호출이 만든 파일은 되돌리며 빈 폴더는 남을 수 있음. 강제 종료는 일부 파일이 남을 수 있으니 Git 상태 확인. 기존 파일을 덮어쓰지 않음 |
 | PowerShell PS1 정책 차단 | 정책 변경 없이 위 Python 진입점 사용. `start.ps1`은 선택 래퍼이며 현재 로컬에서는 정책 차단으로 미검증 |
@@ -32,21 +36,23 @@ command -v codex
 
 ## Codex 채팅에 입력
 
-설치가 됐으면:
-
-```text
-과제 README와 기존 AGENTS.md를 우선하고 .harness/templates/START.md와 .harness/AGENTS.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
-```
-
-설치가 안 됐으면:
+기본 배치에서는 설치 성공/실패와 관계없이 현재 원본을 읽는 한 문장으로 시작할 수 있다:
 
 ```text
 과제 README와 기존 AGENTS.md를 먼저 읽고 ex-harness/AGENTS.md와 ex-harness/templates/START.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
 ```
 
+원본이 과제 밖에 있고 설치 지침이 현재 원본과 일치하면 시작 프로그램은 다음 문장도 안내한다. 충돌 시에는 출력한 실제 원본 경로를 쓴다:
+
+```text
+과제 README와 기존 AGENTS.md를 우선하고 .harness/templates/START.md와 .harness/AGENTS.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
+```
+
 하네스가 다른 위치라면 시작 프로그램이 출력한 실제 원본 경로를 사용한다. CLI/채팅 모두 없으면 감독자에게 제공 진입점을 문의한다. 기존 파일 충돌은 보존하므로 출력된 원본 Skill 경로를 직접 읽힌다. 파일 8개를 복사한 것은 활성화 증거가 아니다. Hook은 필요 없다.
 
 ## 긴 입력은 IDE 편집기로
+
+터미널 붙여넣기는 사용자 제공 환경 안내 기준 `Ctrl+Shift+V`다. 서술형 단계에서는 AI 사용·복사 붙여넣기를 하지 않는다.
 
 | 입력 위치 | 할 일 |
 |---|---|
@@ -62,6 +68,19 @@ command -v codex
 이미 Codex 안에서 실행할 때는 `--existing-session`으로 중첩 시작을 막는다. 환경의 `CODEX_THREAD_ID`가 있으면 자동으로 시작을 생략하지만 모든 IDE 감지를 보장하지는 않는다. Skill 목록 미갱신 시 먼저 HANDOFF·Git 상태를 저장하고 과제 폴더 터미널의 `codex resume`으로 세션을 선택한다. 현재 채팅 유지·`/compact`도 가능하다. 자동 상태 공유를 가정하지 않는다.
 
 P1~P7 운영·판단 질문·검증된 로컬 커밋·알고리즘/UI 확인은 설치본 `.harness/templates/START.md`와 단계별 Skill을 따른다. Git 저장소가 없으면 init 전에 묻는다. UI 직접 확인이 불가능하면 사용자 조작 안내 후 미검증으로 남긴다. 실제 검증 없이 완료/커밋하지 않는다.
+
+## Clone 위치와 제출 범위
+
+기본 2명령은 과제 폴더 밖 쓰기를 요구하지 않으므로 현장 기본으로 유지한다. P7에서 실제 제출 방식과 목록/용량을 확인한다. 폴더 전체 제출은 중첩 `ex-harness/.git`도 포함할 수 있다. `.gitignore`는 전송 제외 기능이 아니다. 원본·기존 파일을 임의 삭제하지 않는다.
+
+**과제 밖 형제 폴더 쓰기가 허용되고, 제출 범위가 과제 폴더로 확정**된 경우에는 같은 README 폴더에서 아래처럼 시작하면 하네스 원본이 제출 폴더 밖에 놓인다. `../ex-harness`가 이미 있으면 다른 빈 경로를 선택하고 자동 덮어쓰기하지 않는다.
+
+```sh
+git clone https://github.com/ksh0330/ex-harness ../ex-harness
+sh ../ex-harness/start.sh --target .
+```
+
+대안은 `python3 ../ex-harness/tools/start.py --target .`이며 출력한 최초 문장을 쓴다. 설치된 `.harness/`와 `.agents/skills/`는 여전히 과제 안에 있다. CLI가 외부 원본을 읽지 못하면 현재 설치본을 읽고 미검증을 남긴다. 제출 방식이 불명확하면 기본 배치를 유지하며 임의 이동/삭제하지 않는다. 두 배치의 실행 근거는 [검증 기록](VERIFICATION.md)에 남긴다.
 
 ## 이전 일정 기반 연습 자료
 

@@ -115,7 +115,7 @@ AGENTS는 프로젝트의 지속 규칙, Skill은 선택한 작업의 절차, Ha
 
 플랫폼·시험 제한을 먼저 지킨다. 그 범위에서 현재 사용자 지시와 과제의 제출 요구를 따른다. AGENTS는 상위 폴더에서 현재 폴더로 적용되며 가까운 지침이 더 구체적이다. `AGENTS.override.md`가 있으면 해당 위치의 AGENTS보다 우선할 수 있다. Skill이나 오래된 Handoff로 현재 지시·프로젝트 규칙을 덮어쓰지 않는다. 충돌이 결과를 바꾸면 사용자에게 확인한다. 설치된 `.harness/AGENTS.md`는 보조 파일이므로 명시적으로 읽게 한다. [공식 AGENTS 안내](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 
-Skill 자동 선택은 요청과 Skill 설명이 맞을 때 AI가 판단하는 방식이다. `$discover ...`처럼 명시하면 사용자가 이번 절차를 지정한다. 자동 선택은 놓치거나 과하게 적용될 수 있으므로 첫 연습·중요 검증에는 명시 호출을 추천한다. 작은 수정은 자연어로 충분하다. 명시 호출도 작업 성공을 보장하지 않으며 결과·실행 증거를 확인해야 한다. [공식 Skill 안내](https://learn.chatgpt.com/docs/build-skills)
+Skill 자동 선택은 요청과 Skill 설명이 맞을 때 AI가 판단하는 방식이다. Codex가 필요한 Skill을 스스로 선택하고, 인식이 안 되면 해당 SKILL.md를 직접 읽는다. 사용자가 매번 호출할 필요는 없다. `$discover ...` 같은 명시 호출은 선택 사항이며 성공 보장이 아니다. 결과·실행 증거를 확인한다. [공식 Skill 안내](https://learn.chatgpt.com/docs/build-skills)
 
 `/skills` 또는 `$` 선택 목록에서 이름을 선택하고 요청을 붙여 전송한다. 호출 표시가 입력창에서 자연어로 바뀐 것만으로 실행 성공을 판정하지 않는다. 응답에서 적용 Skill·읽은 파일·조사 또는 검증 결과를 확인한다. 보이지 않으면 `.agents/skills/discover/SKILL.md를 읽고 수행해`로 대체한다.
 

@@ -164,6 +164,8 @@ class ExampleTests(unittest.TestCase):
 
     def test_optional_installed_kit_runs_outside_source(self):
         target = self.work / "target"
+        target.mkdir()
+        (target / "README.md").write_text("# Synthetic task", encoding="utf-8")
         result = subprocess.run([sys.executable, str(ROOT / "tools/install.py"), "--target", str(target), "--apply", "--with-examples"], capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         kit = target / ".harness/kit"

@@ -22,6 +22,8 @@ class InstallTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.target = Path(self.temp.name) / "project with spaces"
+        self.target.mkdir()
+        (self.target / "README.md").write_text("# Synthetic task", encoding="utf-8")
 
     def run_install(self, *args):
         return subprocess.run([sys.executable, str(ROOT / "tools/install.py"), "--target", str(self.target), *args], capture_output=True, text=True)
@@ -30,10 +32,9 @@ class InstallTests(unittest.TestCase):
         result = self.run_install()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("mode=preview", result.stdout)
-        self.assertFalse(self.target.exists())
+        self.assertEqual(list(self.target.iterdir()), [self.target / "README.md"])
 
     def test_apply_preserves_existing_and_repeat_is_identical(self):
-        self.target.mkdir()
         files = {"AGENTS.md": "project rules\n", "docs/STATUS.md": "user progress\n",
                  ".harness/GUIDE.md": "user guide\n", ".git/config": "[user]\n name = unchanged\n",
                  ".agents/skills/discover/custom.txt": "existing skill\n"}
@@ -74,7 +75,6 @@ class InstallTests(unittest.TestCase):
                     self.assertTrue((path.parent / link.split("#", 1)[0]).exists(), f"{path.name}: {link}")
 
     def test_preflight_rejects_blocked_parent_without_partial_install(self):
-        self.target.mkdir()
         (self.target / ".agents").write_text("blocked", encoding="utf-8")
         before = snapshot(self.target)
         result = self.run_install("--apply")
@@ -84,11 +84,18 @@ class InstallTests(unittest.TestCase):
     def test_rejects_source_and_non_directory_target(self):
         with self.assertRaises(ValueError):
             plan(ROOT)
-        self.target.write_text("file", encoding="utf-8")
+        with self.assertRaises(ValueError):
+            plan(self.target / "README.md")
+
+    def test_missing_readme_or_absent_target_never_installs(self):
+        (self.target / "README.md").unlink()
         self.assertEqual(self.run_install("--apply").returncode, 2)
+        self.assertEqual(list(self.target.iterdir()), [])
+        self.target.rmdir()
+        self.assertEqual(self.run_install("--apply").returncode, 2)
+        self.assertFalse(self.target.exists())
 
     def test_link_escape_is_rejected(self):
-        self.target.mkdir()
         outside = Path(self.temp.name) / "outside"
         outside.mkdir()
         link = self.target / ".harness"
@@ -115,10 +122,10 @@ class InstallTests(unittest.TestCase):
         bash = str(git_bash) if git_bash.is_file() else shutil.which("bash")
         if not bash:
             self.skipTest("Bash unavailable")
-        self.target.mkdir()
+        before = snapshot(self.target)
         result = subprocess.run([bash, str(ROOT / "install.sh")], cwd=self.target, capture_output=True, text=True, encoding="utf-8")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(list(self.target.iterdir()), [], "wrapper must preview by default")
+        self.assertEqual(snapshot(self.target), before, "wrapper must preview by default")
         result = subprocess.run([bash, str(ROOT / "install.sh"), "--apply"], cwd=self.target, capture_output=True, text=True, encoding="utf-8")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue((self.target / "AGENTS.md").is_file())

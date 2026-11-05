@@ -23,6 +23,7 @@ for runtime in python3 python; do
 done
 printf '%s\n' 'Python 3.10+ unavailable; no installation or Codex launch performed. Automatic recovery: no.' >&2
 printf '%s\n' 'Next: in the provided Codex chat, enter this one sentence:' >&2
+printf '%s\n' '먼저 /model 또는 제공 화면에서 허용 모델을 선택합니다. 사용자 안내: Sol 6.1/6.0, Terra 5.6, Luna 6.0; Astra/Claude 금지.' >&2
 printf '과제 README와 기존 AGENTS.md를 먼저 읽고 "%s/AGENTS.md"와 "%s/templates/START.md"를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.\n' "$HARNESS_ROOT" "$HARNESS_ROOT" >&2
 printf '%s\n' 'If no Codex chat/CLI is available, ask the proctor for the provided entry point; do not install or change security settings.' >&2
 exit 2

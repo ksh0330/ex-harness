@@ -1,5 +1,12 @@
 # 기능 근거와 검증 경계
 
+## 2026-11-05 최종 개편 확인
+
+- [공식 CLI 명령](https://learn.chatgpt.com/docs/developer-commands?surface=cli) 본문과 로컬 `codex --help`에서 대화형 `[PROMPT]`, `--model`, `/model` 문서 근거를 확인했다. 기본 시작은 모델 선택 후 지시 1회이며, 확인한 ID를 지정할 때만 자동 전달한다. 실제 TUI 모델 선택/모델 응답은 미검증이다.
+- [공식 Skill 경로](https://learn.chatgpt.com/docs/build-skills)는 `.agents/skills` 탐색을 설명한다. 하네스는 파일 존재/내용만 확인하며 실제 자동 호출을 입증하지 않는다.
+- [공식 Hook](https://learn.chatgpt.com/docs/hooks)은 제공 기능·신뢰 검토를 설명한다. 공식 지원은 현장 허용과 다르다. 이번 작업은 Hook을 설치/활성화하지 않았으며 지침의 단계 점검으로 운영한다.
+- 사용자가 제공한 **11/05 재시험 안내**: Cofa Probe 내부 터미널/편집기/Browser/DM, 제공 Codex CLI, Sol 6.1·Sol 6.0·Terra 5.6·Luna 6.0 권장, Astra·Claude 금지, 업데이트 금지, 공개 clone 허용, 시험 push/외부 전송 금지, Ctrl+Shift+V, RAM 16GB, 제출 10GB 이하, 코딩 최대 180분·서술형 30분·최종 23:00 종료, 서술형 AI/붙여넣기 금지. 주최 측 원본·현장 화면을 독립 확인한 기록은 아니며 최신 현장 안내가 우선이다. 아래 이전 일정은 현재 일정이 아니다.
+
 ## 2026-11-05 Bootstrap 공식 근거
 
 사전 개선 작업에서 아래 공식 페이지 본문과 로컬 CLI 0.166.0 도움말을 확인했다. 현장 검색·외부 전송 허용 근거로 쓰지 않는다.

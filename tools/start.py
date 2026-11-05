@@ -4,6 +4,7 @@ import argparse
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -19,15 +20,16 @@ SKILLS = ("discover", "agreement", "build-slice", "verify", "phase-gate",
 SHORT_PROMPT = "과제 README와 기존 AGENTS.md를 우선하고 .harness/templates/START.md와 .harness/AGENTS.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해."
 
 
-def readmes(folder):
-    return sorted(p for p in folder.iterdir()
-                  if p.is_file() and (p.name.lower() == "readme" or p.name.lower().startswith("readme.")))
+readmes = install.readmes
 
 
 def candidates(cwd):
     """Only ancestors and immediate children; never scan a home tree recursively."""
     cwd = Path(os.path.abspath(cwd))
     origin = SOURCE.parent if cwd == SOURCE or SOURCE in cwd.parents else cwd
+    # The documented entry is the task README cwd, even in a monorepo.
+    if readmes(origin):
+        return [origin]
     found = set()
     for folder in (origin, *origin.parents):
         if folder == SOURCE or SOURCE in folder.parents:
@@ -66,12 +68,9 @@ def select_target(explicit=None, cwd=None):
                 target = options[int(answer) - 1]
             else:
                 target = Path(os.path.abspath(Path(answer).expanduser()))
-    install.plain_path(target)
     if target == SOURCE or SOURCE in target.parents:
         raise ValueError("target must be the task directory, outside the harness source")
-    if not target.is_dir() or not readmes(target):
-        raise ValueError(f"target needs a README: {target}")
-    return target
+    return install.task_root(target)
 
 
 def capture(command, cwd):
@@ -85,6 +84,12 @@ def describe(target):
     print(f"existing AGENTS.md={(target / 'AGENTS.md').exists()}")
     print("entries=" + ", ".join(p.name for p in sorted(target.iterdir()) if p.name != ".git")[:600])
     print("지정 산출물·실행 방법: Codex가 위 README와 관련 진입점을 읽어 확인합니다.")
+    if target in SOURCE.parents:
+        print(f"SUBMISSION: 하네스 원본 {SOURCE.relative_to(target)} (내부 .git 포함)이 과제 폴더 안에 있습니다.")
+        print("폴더 전체 제출에는 이 원본도 포함됩니다. .gitignore만으로 제출 용량에서 제외되지 않습니다.")
+    else:
+        print("SUBMISSION: 하네스 원본은 과제 폴더 밖입니다. 설치 지침은 과제 폴더 안에 추가됩니다.")
+    print("P7에서 과제의 제출 범위·파일 수·실제 용량을 확인합니다. 원본/기존 파일 자동 삭제는 하지 않습니다.")
     git = shutil.which("git")
     if git:
         try:
@@ -114,27 +119,56 @@ def cli_command():
     return [command]
 
 
+def task_prompt(target=None):
+    """Preserve old guides, but never silently launch using their stale contents."""
+    guides = (("AGENTS.md", ".harness/AGENTS.md"),
+              ("templates/START.md", ".harness/templates/START.md"))
+    try:
+        current = target and all((target / dest).is_file()
+                                 and (target / dest).read_bytes() == (SOURCE / src).read_bytes()
+                                 for src, dest in guides)
+    except OSError:
+        current = False
+    if current:
+        prompt = SHORT_PROMPT
+    else:
+        prompt = f'과제 README와 기존 AGENTS.md를 우선하고 "{SOURCE / "templates/START.md"}"와 "{SOURCE / "AGENTS.md"}"를 보조로 읽어 P1부터 P7까지 진행해.'
+    return prompt + f' Skill 충돌/미인식 시 원본 "{SOURCE / "skills"}"의 해당 SKILL.md를 읽어.'
+
+
+def model_guidance():
+    print("Codex에서 /model 또는 제공 선택 화면으로 허용 모델을 먼저 선택합니다.")
+    print("사용자 제공 시험 안내: Sol 6.1 권장; Sol 6.0 / Terra 5.6 / Luna 6.0. Astra·Claude 금지.")
+    print("표시 이름을 CLI ID로 추측하지 않습니다. 현장 목록·규정이 우선이며 버전/설정은 변경하지 않습니다.")
+
+
 def fallback(target=None, installed=False):
     print("Automatic recovery: no runtime/config/security changes. No automatic retry.")
-    if installed:
-        print("Next: 제공된 Codex 채팅에 한 문장 입력:\n" + SHORT_PROMPT)
-    else:
-        print("Next: 제공된 Codex 채팅에 한 문장 입력:")
-        print(f'과제 README와 기존 AGENTS.md를 먼저 읽고 "{SOURCE / "AGENTS.md"}"와 "{SOURCE / "templates/START.md"}"를 보조로 읽어 P1부터 P7까지 진행해.')
+    model_guidance()
+    print("Next: 제공된 Codex 채팅에 한 문장 입력:")
+    # Source-only recovery must work even when the destination cannot be read.
+    print(task_prompt(target if installed else None))
     if target:
         print(f"작업 폴더: {target}")
     print("CLI/채팅 모두 없으면 감독자에게 제공 진입점을 문의합니다. 설치·업데이트·권한 우회는 하지 않습니다.")
 
 
-def launch(target):
+def launch(target, model=None):
     command = cli_command()
     result = capture([*command, "--help"], target)
     if result.returncode or "[PROMPT]" not in result.stdout:
         raise ValueError(f"{command[0]} --help failed or interactive PROMPT unsupported (exit={result.returncode}): {result.stderr.strip()[:400]}")
-    prompt = SHORT_PROMPT + f' Skill 충돌/미인식 시 원본 "{SOURCE / "skills"}"의 해당 SKILL.md를 읽어.'
-    print("Starting interactive Codex [PROMPT] in the target; no exec or policy overrides.", flush=True)
+    if model:
+        if "--model" not in result.stdout:
+            raise ValueError("provided codex --help does not advertise --model; use model selection in the provided chat")
+        command += ["--model", model, task_prompt(target)]
+        print(f"Starting interactive Codex with explicitly supplied model ID: {model}", flush=True)
+    else:
+        model_guidance()
+        print("모델 선택 후 최초 프롬프트:\n" + task_prompt(target))
+        print("Starting interactive Codex without a task prompt; select the allowed model first.", flush=True)
     # Inherit the terminal. Piping a prompt into `codex exec` would be one-shot.
-    result = subprocess.run([*command, prompt], cwd=target)
+    result = subprocess.run(command, cwd=target)
     if result.returncode:
         print(f"FAILED interactive Codex exit={result.returncode}; installation is present, session start not confirmed.", file=sys.stderr)
         fallback(target, installed=True)
@@ -147,10 +181,14 @@ def main(argv=None):
     parser.add_argument("--preview", action="store_true", help="show plan; no writes or CLI launch")
     parser.add_argument("--no-launch", action="store_true", help="install only, print one-sentence chat prompt")
     parser.add_argument("--existing-session", action="store_true", help="install but do not nest another Codex session")
+    parser.add_argument("--model", help="exact allowed model ID confirmed in the provided CLI; sends initial prompt automatically")
     args = parser.parse_args(argv)
     target = None
     installed = False
     try:
+        if args.model is not None and (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:/-]*", args.model)
+                                       or any(name in args.model.lower() for name in ("astra", "claude"))):
+            raise ValueError("invalid or prohibited model ID; select an allowed model in the provided Codex")
         print(f"cwd={Path.cwd()}\nharness={SOURCE}\nos={platform.system()}\npython={sys.executable} {platform.python_version()}")
         for name in ("bash", "sh", "python3", "python", "codex"):
             print(f"{name}={shutil.which(name) or 'not found'}")
@@ -168,6 +206,10 @@ def main(argv=None):
             return 0
         created = install.apply_plan(pairs)
         installed = True
+        for src, dest in ((SOURCE / "AGENTS.md", target / ".harness/AGENTS.md"),
+                          (SOURCE / "templates/START.md", target / ".harness/templates/START.md")):
+            if dest.read_bytes() != src.read_bytes():
+                print(f"GUIDE fallback: preserved {dest}; read current source {src}")
         present = 0
         for name in SKILLS:
             path = target / ".agents/skills" / name / "SKILL.md"
@@ -188,7 +230,7 @@ def main(argv=None):
             print("Interactive terminal unavailable; CLI not launched.", file=sys.stderr)
             fallback(target, installed=True)
             return 2
-        return launch(target)
+        return launch(target, args.model)
     except (OSError, ValueError, subprocess.TimeoutExpired, EOFError) as exc:
         print(f"FAILED bootstrap: {exc}", file=sys.stderr)
         fallback(target, installed)

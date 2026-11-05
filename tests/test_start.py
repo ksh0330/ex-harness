@@ -32,7 +32,7 @@ class StartTests(unittest.TestCase):
         self.fake = self.base / "fake_cli.py"
         self.fake.write_text('''import json, os, pathlib, sys
 if sys.argv[1:] == ["--help"]:
-    print("Usage: codex [OPTIONS] [PROMPT]")
+    print("Usage: codex [OPTIONS] [PROMPT] --model MODEL")
 else:
     pathlib.Path("cli-call.json").write_text(json.dumps({"cwd": os.getcwd(), "args": sys.argv[1:]}, ensure_ascii=False), encoding="utf-8")
     sys.exit(int(os.environ.get("FAKE_CODEX_EXIT", "0")))
@@ -47,18 +47,65 @@ else:
                 patch.object(start, "cli_command", return_value=[sys.executable, str(self.fake)]):
             return start.main(["--target", str(self.project), *args])
 
-    def test_one_command_installs_and_passes_single_interactive_prompt(self):
+    def test_default_installs_and_waits_for_model_selection_without_prompt(self):
         self.assertEqual(self.run_start(), 0, self.output.getvalue())
         call = json.loads((self.project / "cli-call.json").read_text(encoding="utf-8"))
         self.assertEqual(Path(call["cwd"]), self.project)
-        self.assertEqual(len(call["args"]), 1)
-        self.assertIn("P1", call["args"][0])
+        self.assertEqual(call["args"], [])
+        self.assertIn("/model", self.output.getvalue())
         self.assertNotIn("exec", call["args"])
         for name in start.SKILLS:
             self.assertTrue((self.project / ".agents/skills" / name / "SKILL.md").is_file())
         self.assertFalse((self.project / ".git").exists())
         self.assertFalse((self.project / ".codex").exists())
         self.assertFalse((self.project / ".harness/hooks").exists())
+
+    def test_explicit_model_passes_exact_id_and_one_prompt(self):
+        self.assertEqual(self.run_start("--model", "provided-sol-id"), 0, self.output.getvalue())
+        call = json.loads((self.project / "cli-call.json").read_text(encoding="utf-8"))
+        self.assertEqual(call["args"][:2], ["--model", "provided-sol-id"])
+        self.assertEqual(len(call["args"]), 3)
+        self.assertIn("P1", call["args"][2])
+
+    def test_invalid_or_prohibited_model_never_installs(self):
+        before = snapshot(self.project)
+        for model in ("gpt-6-astra", "Claude", "", "Sol 6.1", "-flag", "model\nID"):
+            with self.subTest(model=model):
+                self.assertEqual(self.run_start("--model=" + model), 2)
+                self.assertEqual(before, snapshot(self.project))
+
+    def test_model_flag_requires_cli_support(self):
+        with patch.object(start, "capture", return_value=subprocess.CompletedProcess([], 0, "Usage: codex [OPTIONS] [PROMPT]", "")):
+            self.assertEqual(self.run_start("--model", "provided-sol-id"), 2)
+        self.assertFalse((self.project / "cli-call.json").exists())
+
+    def test_stale_guides_preserved_but_current_source_is_used(self):
+        for name in (".harness/templates/START.md", ".harness/AGENTS.md"):
+            path = self.project / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("old guidance", encoding="utf-8")
+        self.assertEqual(self.run_start("--model", "provided-sol-id"), 0, self.output.getvalue())
+        call = json.loads((self.project / "cli-call.json").read_text(encoding="utf-8"))
+        self.assertIn(str(ROOT / "templates/START.md"), call["args"][-1])
+        self.assertNotIn(".harness/templates", call["args"][-1])
+        self.assertIn("GUIDE fallback", self.output.getvalue())
+        self.assertEqual((self.project / ".harness/AGENTS.md").read_text(), "old guidance")
+
+    def test_current_readme_wins_over_parent_and_child_readmes(self):
+        (self.base / "README.md").write_text("parent")
+        child = self.project / "service"
+        child.mkdir()
+        (child / "README.md").write_text("child")
+        self.assertEqual(start.select_target(cwd=self.project), self.project)
+
+    def test_submission_notice_distinguishes_nested_and_sibling_source(self):
+        for source, expected in ((self.project / "ex-harness", "내부 .git 포함"),
+                                 (self.base / "ex-harness", "과제 폴더 밖")):
+            with patch.object(start, "SOURCE", source), redirect_stdout(self.output):
+                start.describe(self.project)
+            self.assertIn(expected, self.output.getvalue())
+            self.output.truncate(0)
+            self.output.seek(0)
 
     def test_preview_no_writes_no_cli(self):
         before = snapshot(self.project)
@@ -100,12 +147,12 @@ else:
         skill = self.project / ".agents/skills/discover"
         skill.mkdir(parents=True)
         (skill / "custom.txt").write_text("keep")
-        self.assertEqual(self.run_start(), 0)
+        self.assertEqual(self.run_start("--model", "provided-sol-id"), 0)
         self.assertFalse((skill / "SKILL.md").exists())
         self.assertIn("SKILL fallback (discover)", self.output.getvalue())
         self.assertIn("runtime recognition NOT verified", self.output.getvalue())
         call = json.loads((self.project / "cli-call.json").read_text(encoding="utf-8"))
-        self.assertIn(str(ROOT / "skills"), call["args"][0])
+        self.assertIn(str(ROOT / "skills"), call["args"][-1])
 
     def test_existing_session_or_no_tty_does_not_nest_cli(self):
         for args, env, tty, code in ((["--existing-session"], {}, True, 0),
@@ -291,7 +338,7 @@ class PosixStartTests(unittest.TestCase):
         self.assertEqual(code, 0, b"".join(output).decode(errors="replace"))
         call = json.loads((self.project / "call.json").read_text())
         self.assertEqual(call["cwd"], str(self.project))
-        self.assertEqual(len(call["args"]), 1)
+        self.assertEqual(call["args"], [])
 
 
 class PowerShellStartTests(unittest.TestCase):
