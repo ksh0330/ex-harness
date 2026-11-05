@@ -1,32 +1,38 @@
 # ex-harness
 
-낯선 프로젝트에서 문제를 좁히고 구현·검증·인계를 수행하는 범용 FDE 하네스.
-과제 답안·외부 AI 연결·자동 설정 변경을 포함하지 않는다. 기존 프로젝트의 스택과 규칙을 우선한다.
-이 사전 준비용 저장소는 2차 예선 결과 통지 전까지 공개 상태를 유지한다.
+**과제 README가 있는 폴더의 터미널**에서 공개 자료 사용이 허용됐을 때 clone한다. `ex-harness` 폴더 안으로 이동하지 않는다.
 
-## 안전한 설치
-
-개발 용어가 낯설면 [처음 쓰는 사람 설명](docs/BASICS.md)부터 읽는다. 명령 입력 위치·결과 판단·질문 예시와 새 PC의 준비용 Codex에 넣을 프롬프트 한 개를 담았다.
-
-과제 폴더의 Bash 터미널에서, 공개 자료 사용이 허용된 경우만 실행한다.
-
-```bash
-git clone https://github.com/ksh0330/ex-harness /tmp/ex-harness
-bash /tmp/ex-harness/install.sh          # 변경 계획만 출력
-bash /tmp/ex-harness/install.sh --apply  # 없는 파일만 추가
+```sh
+git clone https://github.com/ksh0330/ex-harness
+sh ex-harness/start.sh
 ```
 
-Python 3.10+가 필요하다. 설치기는 패키지를 설치하지 않고 네트워크에 연결하지 않는다.
-기존 AGENTS.md·스킬·docs·Git 설정은 보존한다. 기존 AGENTS가 있으면 아래 문장을 Codex에 직접 입력한다.
+시작 명령 하나가 환경·과제 루트·설치 계획을 출력하고, 없는 지침/Skill만 추가한 뒤 대화형 Codex에 P1 분석 시작 지침을 전달한다. 기존 README·AGENTS·사용자 변경·설정은 보존한다. 후보가 여러 개면 번호 또는 경로를 선택한다.
+
+Linux Bash·POSIX `sh`(Ubuntu 24.04), Windows PowerShell의 Python 진입점을 실제 검증했다. **CLI 전달은 가짜 CLI/PTY로 검증했으며 실제 AI 대화·Skill 인식·Cofa는 미검증**이다. Python 기본 설치를 가정하지 않는다. [검증 기록](docs/VERIFICATION.md).
+
+| 상황 | 과제 README 폴더 터미널에 입력 |
+|---|---|
+| `bash` 실행 실패, `sh` 사용 가능 | `sh ex-harness/start.sh` (두 스크립트 모두 POSIX 호환) |
+| 셸 스크립트 불가, Python 3.10+ 확인됨 | `python3 ex-harness/tools/start.py` (`python`만 확인되면 이름 교체) |
+| Windows PowerShell | `python .\ex-harness\tools\start.py` |
+| 이미 Codex가 실행 중 | 시작 명령 뒤 `--existing-session` 추가 또는 아래 문장 입력 |
+
+Python이 없거나 버전이 낮으면 **파일 설치·Codex 실행 없이** 다음 대안을 출력한다. 제공된 **Codex 채팅**에 한 문장 입력한다.
 
 ```text
-과제 README와 기존 AGENTS.md를 먼저 읽고 .harness/AGENTS.md를 보조 지침으로 읽어.
-요청의 수용 기준과 관련 코드부터 확인하고 가장 작은 실행 흐름을 구현·검증해.
+과제 README와 기존 AGENTS.md를 먼저 읽고 ex-harness/AGENTS.md와 ex-harness/templates/START.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
 ```
 
-설치가 불가능하면 이 두 문장만 직접 지시해도 핵심 절차를 사용할 수 있다.
-스킬이 보이지 않으면 `.agents/skills/verify/SKILL.md를 읽고 수행해`처럼 요청한다.
-기존 스킬 이름이 충돌하면 보존되므로 원본 하네스 경로의 SKILL.md를 직접 읽는다.
+CLI가 없거나 실행 실패해도 위 문장으로 제공 채팅에서 진행한다. CLI·채팅 모두 없으면 감독자에게 제공 진입점을 문의한다. 런타임 설치·업데이트·보안 우회는 하지 않는다. 긴 요청·담당자 DM은 플랫폼 IDE 편집기에 Markdown으로 저장하고 Codex에 그 파일을 읽힌다.
+
+## 필요한 경우만
+
+`--preview`는 무변경 계획 확인, `--no-launch`는 설치 후 채팅용 문장 출력, `--target 경로`는 과제 루트 지정이다. 기존 `install.sh`는 계속 preview가 기본이며 `--apply`로만 쓴다. 부트스트랩은 이 설치기를 재사용한다. 추가 패키지·Hook·MCP·Plugin 없이 동작한다.
+
+Skill 8개의 **파일 존재**만 확인한다. 목록에 인식되면 사용하고, 미인식이면 `.agents/skills/verify/SKILL.md`를 직접 읽힌다. 이름 충돌은 보존하며 원본 `ex-harness/skills/verify/SKILL.md`를 읽힌다. [시작 지침](templates/START.md)에 P1~P7·중요 결정·검증된 로컬 커밋·UI·알고리즘 보강·인계를 정리했다.
+
+낯선 용어는 [처음 쓰는 사람 설명](docs/BASICS.md), 실패 원인별 다음 행동은 [빠른 시작](docs/QUICKSTART.md)을 참고한다. 설치·시작 로직은 네트워크에 연결하지 않는다. Codex 사용은 현장에서 허용된 도구·인증만 사용한다.
 
 ## 개발·검증
 

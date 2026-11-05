@@ -1,5 +1,7 @@
 # 직접 운용하는 매뉴얼
 
+2026-11-05 시작 방식: 과제 README 폴더에서 clone 후 `sh ex-harness/start.sh`. Bash/셸 실패·Python 없음·PowerShell 대안은 [빠른 시작](QUICKSTART.md)에 통합했다. 아래 10/31 도움말·연습 기록은 당시 증거이며 현재/Cofa 실동작 보장이 아니다.
+
 읽는 순서: [빠른 시작](QUICKSTART.md) → 이 문서의 입력 위치·한 흐름 실습 → [구조](ARCHITECTURE.md) → [35분 모의시험](SIMULATION.md).
 용어가 대부분 낯설면 [처음 쓰는 사람 설명](BASICS.md)부터 읽는다. 긴 실습·모의시험은 선택 사항이다.
 문서의 **가상 출력**은 화면 모양을 설명하기 위한 예시다. 이번 실제 결과는 [검증 기록](VERIFICATION.md), 공식 지원 근거는 [SOURCES](SOURCES.md)에 있다.

@@ -2,13 +2,15 @@
 
 ## 2026-11-05 개편 — 현재 작업
 
-현재 단계: P5 전체 회귀 완료 → P6 문서·인계 검토. 현재 범위는 AGREEMENT B1~B7.
+현재 단계: P7 로컬 구현·운영 문서 전달. 현재 범위는 AGREEMENT B1~B7.
 시작 Git 상태: clean. 기존 설치기·8개 스킬과 테스트 24개 확인.
 환경: Windows PowerShell, Python 3.12.9, Node 24.18.1, Codex CLI 0.166.0.
 초기 샌드박스 실행은 Bash DLL 초기화(3221225794), HTTP 연결(10013), junction 생성 권한으로 실패했다. 승인된 로컬 실행에서 기존 24개 통과, Bash 5.3.9 확인. Ubuntu 24.04/WSL, Python 3.12.3의 Bash·POSIX sh·PTY 확인.
-현재 전체: Windows 45개 중 40 통과·5 skip(19.416초); Ubuntu 결과는 VERIFICATION에 기록한다. check_repo skills=8/errors=0. 공식 quick_validate는 `python -X utf8`로 8개 valid(기본 cp949 실패와 구분).
+현재 전체: Windows 45개 중 40 통과·5 skip(19.416초); Ubuntu 45개 중 43 통과·2 skip(18.485초). check_repo skills=8/errors=0. 공식 quick_validate는 `python -X utf8`로 8개 valid(기본 cp949 실패와 구분).
 구현: 시작→환경/루트→기존 plan/apply_plan→대화형 prompt 전달, I/O rollback, 원본 Skill 대안. 현재 단계 운영·로컬 커밋·UI/알고리즘 보강·인계 지침 반영.
-남은 일: 최종 문서·diff 검토, 출력 문구 수정 관련 검증, 검증된 로컬 커밋, 최신 HANDOFF. 실제 AI·Cofa·UI·IDE 붙여넣기는 미검증. PS1은 실행 정책에 막혀 Python 직접 진입을 검증/안내한다.
+최종 확인: 출력 문구 수정 후 Windows 관련 21개 중 16 통과·5 skip(7.136초). 코드 커밋 `3aa6ecd`를 네트워크 없이 새 로컬 clone한 Ubuntu 회귀도 21개 중 19 통과·2 skip(3.856초), LOCAL_CLONE_SMOKE_OK. 운용 문서 변경 후 설치 회귀 8개 통과(3.678초), check_repo·diff 공백 검사 통과.
+남은 현장 확인: 실제 AI·Skill 인식·Cofa·UI·IDE 붙여넣기·resume. PS1은 실행 정책에 막혀 Python 직접 진입을 검증/안내한다. 이 작업은 로컬 커밋만 저장하며 공개 원격 반영은 별도 push 승인 이후다.
+커밋: `3aa6ecd`(P4 코드·회귀), 이 상태/인계를 포함하는 P7 커밋(지침·문서·최종 증거). git log/status로 최종 확인한다. 실행 중 테스트 서버 없음.
 감사: 범용 설치 프레임워크·런타임 설치·외부 서비스·시험 자료 추가 없음. 실제 AI/Cofa·UI 확인을 테스트 대역과 구분한다.
 
 아래는 이전 작업 기록이며 현재 검증 증거와 구분한다.

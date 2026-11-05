@@ -1,4 +1,69 @@
-# 시험 직전 빠른 시작
+# 시험 시작과 간단한 복구
+
+현재 시작 방식(2026-11-05): 과제 README 폴더 터미널에서 `git clone https://github.com/ksh0330/ex-harness`, 이어서 `sh ex-harness/start.sh`. 하네스 폴더 안으로 이동하지 않는다. 설치는 없는 지침만 추가하고 기존 설치기를 재사용한다. Python 3.10+가 없으면 짧은 직접 지시로 진행한다.
+
+실제 검증은 Ubuntu Bash·POSIX sh, Windows PowerShell/Python, 가짜 CLI의 인자 전달까지다. 실제 AI 대화·Skill 인식·Cofa 통과를 의미하지 않는다. [상세 증거](VERIFICATION.md).
+
+## 실행 전 실제 환경
+
+Linux 터미널에서 아래는 읽기 전용 확인이다. 시작 명령도 이 경로들을 출력한다. 명령 존재와 실행 성공은 다르다.
+
+```sh
+pwd
+command -v bash
+command -v sh
+command -v python3
+command -v python
+command -v codex
+```
+
+| 관찰된 실패 | 원인 구분·다음 행동 |
+|---|---|
+| `bash: not found` / 실행 자체 실패 | Bash 부재와 실행 오류를 구분한다. `sh`가 확인되면 `sh ex-harness/start.sh`. 이 파일과 install.sh만 POSIX 호환이며 다른 Bash 전용 파일을 sh로 실행하지 않는다 |
+| `Permission denied` | `./start.sh`의 실행 비트 문제라면 허용된 `sh ex-harness/start.sh`로 해석할 수 있다. 읽기 자체/정책이 막혔으면 우회하지 않고 직접 지시 대안 |
+| `sh`도 불가 | 확인된 Python 3.10+로 `python3 ex-harness/tools/start.py`. Windows PowerShell은 `python .\ex-harness\tools\start.py` |
+| Python 없음·낮음·실행 실패 | 자동 선택은 python3→python 순서로 버전을 검사한다. 모두 실패하면 설치하지 않고 아래 Codex 문장 출력. 런타임을 설치하지 않는다 |
+| 과제 루트 후보 여러 개/없음 | 번호/README 폴더 경로 선택. 비대화형은 추측하지 않고 `--target` 요구. target은 존재하는 README 폴더여야 함 |
+| Codex 없음·help 실패·실행 오류 | 실패 명령/종료 코드를 보존하고 제공 채팅에 아래 한 문장. 자동 재시도·exec 전환 없음 |
+| 설치 중 I/O 오류 | Codex 시작 금지. 이번 호출이 만든 파일은 되돌리며 빈 폴더는 남을 수 있음. 강제 종료는 일부 파일이 남을 수 있으니 Git 상태 확인. 기존 파일을 덮어쓰지 않음 |
+| PowerShell PS1 정책 차단 | 정책 변경 없이 위 Python 진입점 사용. `start.ps1`은 선택 래퍼이며 현재 로컬에서는 정책 차단으로 미검증 |
+
+복구 명령은 과제 README 폴더에서 입력한다. clone이 이미 있으면 반복하지 않는다. 자동 복구는 확인된 Python 선택까지만 하며, root/설치 오류·Codex 실패는 상태와 대안을 출력하고 끝낸다.
+
+## Codex 채팅에 입력
+
+설치가 됐으면:
+
+```text
+과제 README와 기존 AGENTS.md를 우선하고 .harness/templates/START.md와 .harness/AGENTS.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
+```
+
+설치가 안 됐으면:
+
+```text
+과제 README와 기존 AGENTS.md를 먼저 읽고 ex-harness/AGENTS.md와 ex-harness/templates/START.md를 보조로 읽어 P1 분석부터 P7 전달까지 진행해.
+```
+
+하네스가 다른 위치라면 시작 프로그램이 출력한 실제 원본 경로를 사용한다. CLI/채팅 모두 없으면 감독자에게 제공 진입점을 문의한다. 기존 파일 충돌은 보존하므로 출력된 원본 Skill 경로를 직접 읽힌다. 파일 8개를 복사한 것은 활성화 증거가 아니다. Hook은 필요 없다.
+
+## 긴 입력은 IDE 편집기로
+
+| 입력 위치 | 할 일 |
+|---|---|
+| Bash/터미널 | 짧은 시작 명령만 입력 |
+| Codex 채팅 | `notes/INPUT.md를 읽고 반영해`처럼 짧은 지시 |
+| 플랫폼 IDE 편집기 | `notes/INPUT.md`를 만들고 긴 요청을 붙여넣기 |
+| 담당자 DM 메모 | `notes/STAKEHOLDER.md`에 질문/실제 답변/미응답·출처 구분 |
+
+메모에는 키·인증정보를 저장하지 않는다. 과제 자료·산출물은 플랫폼 밖으로 전송하지 않는다. 이 파일 경로는 예시이며 아직 생성됐다고 가정하지 않는다.
+
+## 기존 세션과 단계 운영
+
+이미 Codex 안에서 실행할 때는 `--existing-session`으로 중첩 시작을 막는다. 환경의 `CODEX_THREAD_ID`가 있으면 자동으로 시작을 생략하지만 모든 IDE 감지를 보장하지는 않는다. Skill 목록 미갱신 시 먼저 HANDOFF·Git 상태를 저장하고 과제 폴더 터미널의 `codex resume`으로 세션을 선택한다. 현재 채팅 유지·`/compact`도 가능하다. 자동 상태 공유를 가정하지 않는다.
+
+P1~P7 운영·판단 질문·검증된 로컬 커밋·알고리즘/UI 확인은 설치본 `.harness/templates/START.md`와 단계별 Skill을 따른다. Git 저장소가 없으면 init 전에 묻는다. UI 직접 확인이 불가능하면 사용자 조작 안내 후 미검증으로 남긴다. 실제 검증 없이 완료/커밋하지 않는다.
+
+## 이전 일정 기반 연습 자료
 
 먼저 과제 안내를 읽는다. 설치는 선택 사항이다. 지침과 예제를 과제에 맞지 않게 강제하지 않는다.
 기능을 고르기 어렵다면 [매뉴얼 4절: 상황별 추천·선택·비추천](MANUAL.md#4-도구를-언제-선택하는가), 대화 유지·압축·재개·Fork는 [6절](MANUAL.md#6-중단수정재개컨텍스트)을 본다. 명령 지원 근거와 로컬·Cofa 미검증 구분은 매뉴얼 2절에 있다.
@@ -23,34 +88,7 @@
 - [ ] Handoff 저장 후 현재 세션 유지, compact 또는 resume 경로를 한 번 확인
 - [ ] 구조와 약점을 자기 말로 설명. 미확인 항목은 남기고 시험 전 불필요한 설정 작업 중단
 
-## 설치가 필요할 때만
-
-과제 폴더 Bash에서 다음을 각각 실행한다. 이미 `/tmp/ex-harness`가 있으면 clone을 반복하지 말고 내용을 확인한다.
-
-```bash
-git clone https://github.com/ksh0330/ex-harness /tmp/ex-harness
-bash /tmp/ex-harness/install.sh
-bash /tmp/ex-harness/install.sh --apply
-```
-
-첫 설치 실행은 PLAN과 `created=0; mode=preview`. apply는 없는 파일만 CREATE한다.
-기존 AGENTS·스킬·docs·Git 설정은 보존한다. 자동 업데이트는 없다.
-Python 실행명이 `python3`뿐이면 설치기는 자동 선택한다. 예제 명령의 `python`도 `python3`로 바꾼다.
-Windows 사전 준비에서는 `python D:\ex-harness\tools\install.py --target 연습폴더`로 preview, 뒤에 `--apply`로 적용한다.
-원본 저장소 내부에는 설치하지 않는다. 예제가 필요할 때만 `--with-examples`를 추가하고 대상의 `.harness/kit`에서 실행한다.
-
-기존 AGENTS가 있거나 설치하지 않은 경우 Codex 입력창:
-
-```text
-과제 README·AGENTS.md와 관련 진입점·git status를 먼저 확인해.
-수용 기준을 관찰 가능한 동작으로 정하고 가장 작은 흐름부터 구현·관련 검증해.
-모호한 사항만 질문하고 기존 파일·설정과 사용자 변경을 보존해.
-완료 주장에 실행 증거를 붙여. 시험 제한과 외부 전송 금지를 지켜.
-```
-
-보조 지침이 설치됐다면 `.harness/AGENTS.md도 읽어`를 덧붙인다.
-clone이 1분 이상 막히면 위 직접 지시로 진행한다. 보안·네트워크 우회나 런타임 설치로 시간을 쓰지 않는다.
-스킬 미인식 시 `.agents/skills/build-slice/SKILL.md를 읽고 수행해`를 사용한다. 충돌한 스킬은 원본 `/tmp/ex-harness/skills/.../SKILL.md`를 읽는다.
+설치 문제는 위 현재 안내를 따른다. 예제 Python 실행은 `python`/`python3` 중 확인한 이름을 사용하고 기존 앱의 스택을 바꾸지 않는다. 예제가 필요한 경우만 기존 설치기에 `--with-examples --apply`를 지정한다.
 
 ## 180분 예산 예시
 

@@ -9,6 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 def check():
     errors = []
     skills = sorted((ROOT / "skills").glob("*/SKILL.md"))
+    expected = {"discover", "agreement", "build-slice", "verify", "phase-gate", "handoff", "cross-review", "wrapup"}
+    if {path.parent.name for path in skills} != expected:
+        errors.append("expected the original eight skill names")
     for path in skills:
         text = path.read_text(encoding="utf-8")
         parts = text.split("---", 2)

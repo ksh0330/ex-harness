@@ -123,16 +123,15 @@ $handoff      현재 상태·다음 행동 기록
 - [ ] 실행: **프로젝트 README의 서버 명령**을 별도 터미널에서 실행, 0.0.0.0·실제 포트·Browser의 `/` 확인.
 - [ ] 이해: 입력 하나 넣기→결과 확인→관련 테스트 하나→핵심 파일·선택 이유·약점 한 가지 설명.
 
-설치가 필요하고 공개 자료 사용이 허용됐을 때만, **과제 폴더의 Bash**에서:
+설치가 필요하고 공개 자료 사용이 허용됐을 때만, **과제 README 폴더의 터미널**에서:
 
 ```bash
-git clone https://github.com/ksh0330/ex-harness /tmp/ex-harness
-bash /tmp/ex-harness/install.sh
-bash /tmp/ex-harness/install.sh --apply
+git clone https://github.com/ksh0330/ex-harness
+sh ex-harness/start.sh
 ```
 
-두 번째 줄은 PLAN과 `created=0; mode=preview`. 세 번째 줄이 실제 적용이다. 기존 /tmp/ex-harness가 있으면 무작정 재clone하지 않는다.
-**원본 하네스 폴더에서 설치하지 않는다.** 대상은 과제 작업 폴더다. 기존 파일은 KEEP하며 자동 업데이트하지 않는다.
+두 번째 줄은 환경·루트·계획 확인 후 없는 지침을 설치하고 대화형 Codex에 시작 지침을 전달한다. 기존 clone이 있으면 반복하지 않는다. `--preview`는 무변경 계획 확인이다. Python이 없으면 설치 없이 직접 지시 문장을 출력한다.
+**원본 하네스 폴더로 이동하지 않는다.** 대상은 과제 작업 폴더다. 기존 파일은 KEEP하며 자동 업데이트하지 않는다. Bash/셸 실패와 PowerShell 대안은 [빠른 시작](QUICKSTART.md)을 따른다. 실제 AI·Skill 인식·Cofa는 미검증이다.
 기본 설치는 지침·스킬·가이드만 넣는다. 앱 코어·DB를 대상 앱에 자동으로 붙이지 않는다.
 복사/붙여넣기 허용 여부도 현장 안내를 따른다. 허용되지 않으면 의미만 이해하고 직접 입력한다.
 

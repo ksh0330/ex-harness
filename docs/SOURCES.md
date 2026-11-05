@@ -1,5 +1,20 @@
 # 기능 근거와 검증 경계
 
+## 2026-11-05 Bootstrap 공식 근거
+
+사전 개선 작업에서 아래 공식 페이지 본문과 로컬 CLI 0.166.0 도움말을 확인했다. 현장 검색·외부 전송 허용 근거로 쓰지 않는다.
+
+| 자료 | 반영 |
+|---|---|
+| [CLI commands](https://learn.chatgpt.com/docs/developer-commands?surface=cli) | 대화형 `codex [PROMPT]`, 작업 디렉터리·resume. 로컬 `codex --help`의 `[PROMPT]`·resume과 교차 확인 |
+| [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode) | `codex exec`는 비대화형 단발 실행. 시작 프로그램에서 사용하지 않음 |
+| [Build skills](https://learn.chatgpt.com/docs/build-skills) | `.agents/skills` 탐색, 변경 자동 감지·목록 미갱신 시 재시작. 파일 존재와 실제 인식 분리 |
+
+사용자가 제공한 Cofa 안내의 범위는 Codex CLI 사용·Node.js 버전 확인이다. Python 기본 설치·정확한 버전을 보장하는 근거는 제공되지 않았다. 시작 프로그램이 실제 런타임을 확인하며 Cofa는 미검증이다.
+프롬프트 전달은 로컬 가짜 CLI·PTY 경계에서 검증한다. 실제 AI 호출이나 대화·Skill 활성화를 검증했다고 표시하지 않는다.
+
+## 이전 공식 조사 기록
+
 공식 문서 확인일: 2026-10-31 (KST). 아래 페이지를 실제 열어 본문을 확인했다.
 이 문서는 사전 준비 조사 결과다. 시험 중 외부 검색·연결 허용을 뜻하지 않는다.
 공식 기능은 버전·계정·관리 정책에 따라 달라진다. Cofa의 제공 CLI와 과제 안내가 현장 기준이다.
