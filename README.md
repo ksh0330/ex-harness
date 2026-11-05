@@ -37,6 +37,8 @@ python3 ex-harness/tools/start.py
 
 Skill 8개의 **파일 존재**만 확인한다. Codex가 단계에 맞게 선택하고 미인식이면 `.agents/skills/<이름>/SKILL.md`, 충돌이면 원본 `ex-harness/skills/<이름>/SKILL.md`를 읽는다. 기존 보조 지침 충돌도 덮어쓰지 않고 원본을 안내한다. [시작 지침](templates/START.md)에 단계·결정·검증·로컬 커밋·UI·알고리즘·마감·인계를 정리했다.
 
+메인 Builder가 개발을 이어가고 중요 체크포인트에서 [읽기 전용 Reviewer](templates/REVIEW.md)가 감사한다. 실제 지원/현장 허용이 없으면 현재 세션에서 순차 검토하며 독립 검증이라고 하지 않는다. 코딩 종료 전에 [최종 보고서 형식](templates/FINAL_REVIEW.md)으로 `docs/FINAL_REVIEW.md`와 1페이지 요약을 작성·설명한다. 실제 AI 제안·사용자 판단·리뷰 반영·커밋/검증만 기록하며, 서술형 단계에는 AI 사용·답변 자동 입력을 하지 않는다.
+
 Linux Bash·POSIX sh와 Windows Python을 검증했다. **실제 AI 대화·Skill 자동 호출·Hook 활성화·Cofa는 미검증**이며 CLI 인자는 가짜 CLI/PTY로 검증했다. [검증 기록](docs/VERIFICATION.md), [실패 복구](docs/QUICKSTART.md), [용어 설명](docs/BASICS.md). 설치·시작 로직은 네트워크에 연결하지 않으며 Codex는 현장 제공 도구·인증을 사용한다.
 
 ## 개발·검증

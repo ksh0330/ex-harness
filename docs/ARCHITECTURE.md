@@ -2,13 +2,15 @@
 
 ## Bootstrap 데이터 흐름
 
-`start.sh` → POSIX `install.sh --start` → 확인된 Python 3.10+의 `tools/start.py` → 기존 `tools/install.py`의 plan/apply_plan → 과제 루트에서 `codex [PROMPT]`.
+`start.sh` → POSIX `install.sh --start` → 확인된 Python 3.10+의 `tools/start.py` → 기존 `tools/install.py`의 plan/apply_plan → 과제 루트에서 `codex` → 허용 모델 선택 → 최초 지시 1회. 정확한 현장 허용 ID를 `--model`로 명시한 경우에만 `codex --model ID [PROMPT]`로 자동 전달한다.
 PowerShell은 같은 Python 파일을 직접 실행한다. `start.ps1`은 선택 래퍼이며 정책 변경 없이만 사용한다.
 
-루트 탐색은 현재 경로의 조상(첫 Git 경계까지)과 바로 아래 README 폴더만 본다. 하네스 내부는 제외하고, 모호하면 번호/경로 선택 또는 `--target`으로 명시한다. 전체 홈 디렉터리를 재귀 검색하지 않는다.
+현재 README 폴더를 우선하며, 없으면 조상(첫 Git 경계까지)과 바로 아래 README 폴더만 본다. 하네스 내부는 제외하고, 모호하면 번호/경로 선택 또는 `--target`으로 명시한다. 직접 설치도 기존 README가 있어야 한다. 전체 홈 디렉터리를 재귀 검색하지 않는다. `git --no-optional-locks status`로 Git index 캐시도 갱신하지 않는다.
 시작 로직은 계획 출력 후 기존 설치기를 호출한다. 기존 installer의 preview 기본값은 유지한다. 실패 시 Codex를 시작하지 않고, 정상 I/O 예외는 이번에 만든 파일만 rollback한다. 빈 디렉터리·강제 종료의 부분 파일은 남을 수 있다. 기존 파일은 업데이트하지 않는다.
 CLI는 `--help`의 대화형 `[PROMPT]` 지원을 확인하고 원래 터미널을 상속한다. `codex exec`로 바꾸거나 승인·보안·모델 설정을 변경하지 않는다. Windows npm 배치 진입점은 프롬프트를 cmd 문자열에 넣지 않고 같은 npm Node 진입점을 직접 실행한다. CLI 도움말·인자 전달과 실제 AI/Skill 인식은 별도 검증이다.
 Python 없음은 원본 AGENTS와 START를 읽는 채팅 문장으로 대체한다. 이미 실행 중인 세션·비대화형 터미널은 중첩 실행하지 않는다. 8개 Skill 이름·기존 예제 코어는 유지한다.
+
+Builder는 구현을 지속하고 Reviewer는 P2/P4/P5~P6/P7의 중요한 범위를 읽기 전용으로 감사한다. 실제 지원/현장 허용이 없으면 현재 세션 순차 검토라고 표시한다. `templates/REVIEW.md`가 지원 확인·별도 세션·결과 처리 절차, `templates/FINAL_REVIEW.md`가 코딩 종료 전 설명 보고서 형식이다. 설치기는 templates를 그대로 복사하며 기존 기록은 덮어쓰지 않는다. 실제 협업·사용자 결정·리뷰 반영은 STATUS/DECISIONS에서 커밋·파일·검증에 연결한다. 보고서 자동 작성은 Codex 운영 지침이며 시험 서술형 답변 프로그램이 아니다.
 
 아래는 개발 중 재사용할 선택형 도구와 예제 구조다.
 

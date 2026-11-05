@@ -112,6 +112,19 @@ else:
         self.assertEqual(self.run_start("--preview"), 0)
         self.assertEqual(before, snapshot(self.project))
 
+    def test_preview_keeps_git_index_bytes_when_stat_cache_is_stale(self):
+        git = shutil.which("git")
+        if not git:
+            self.skipTest("Git unavailable for fixture")
+        subprocess.run([git, "init", str(self.project)], check=True, capture_output=True)
+        subprocess.run([git, "-C", str(self.project), "add", "README.md"], check=True, capture_output=True)
+        readme = self.project / "README.md"
+        info = readme.stat()
+        os.utime(readme, ns=(info.st_atime_ns, info.st_mtime_ns + 2_000_000_000))
+        before = snapshot(self.project)
+        self.assertEqual(self.run_start("--preview"), 0, self.output.getvalue())
+        self.assertEqual(snapshot(self.project), before)
+
     def test_repeat_preserves_readme_agents_dirty_files_and_identity(self):
         for name, body in (("AGENTS.md", "user rules"), ("app.py", "user unsaved work"),
                            (".git/config", "[user]\nname = user\n")):
@@ -134,8 +147,8 @@ else:
         (self.project / "README.md").write_text("# Unstaged user work")
         before = snapshot(self.project / ".git")
         self.assertEqual(self.run_start("--no-launch"), 0)
-        # git status may refresh stat data in the index; compare the actual
-        # staged contents and config, and prove no harness file was staged.
+        self.assertEqual((self.project / ".git/index").read_bytes(), before["index"])
+        # Also compare staged contents/config and prove no harness file was staged.
         files = subprocess.run([git, "-C", str(self.project), "diff", "--cached", "--name-only"], capture_output=True, text=True, check=True)
         self.assertEqual(files.stdout.strip(), "README.md")
         self.assertEqual((self.project / "README.md").read_text(), "# Unstaged user work")

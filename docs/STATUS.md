@@ -1,5 +1,12 @@
 # 진행 상태
 
+## C6/C7 Reviewer·최종 보고서 연결 — P7
+
+이전 세션 중단 후 미커밋 변경 18개·새 템플릿 2개(REVIEW, FINAL_REVIEW)를 보존 확인했다. 새 기능 추가 없음.
+새 검증(Linux, Python 3.10.12): 전체 53개 중 51 통과·2 skip(PowerShell 전용), 12.979초, exit=0. check_repo skills=8/errors=0, sh 구문·git diff --check exit=0.
+합성 과제 폴더 Bootstrap: `sh ex-harness/start.sh --preview` 무변경, `--no-launch` 설치 created=26·Skill 8/8, 반복 실행·`python3 ex-harness/tools/start.py` exit=0. 설치본 AGENTS/START/wrapup이 `.harness/templates/FINAL_REVIEW.md`·`REVIEW.md`를 참조하고 두 파일이 설치됨.
+Reviewer 모드: 이번 재개 세션은 현재 세션 순차 확인이며 독립 검증 아님. 실제 AI 대화·Skill 자동 호출·Cofa는 미검증 유지.
+
 ## 최종 개편 — P4/P5
 
 P1 범위 커밋 `c1e7006` 후 시작/설치기와 회귀를 보강했다. README cwd 우선·직접 설치 README 필수·기본 모델 선택 후 지시·명시 ID 자동 전달·충돌 지침 원본 참조·제출 경고를 구현했다. 기존 예제 코어는 변경하지 않았다.

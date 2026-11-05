@@ -93,7 +93,7 @@ def describe(target):
     git = shutil.which("git")
     if git:
         try:
-            result = capture([git, "status", "--short", "--untracked-files=normal"], target)
+            result = capture([git, "--no-optional-locks", "status", "--short", "--untracked-files=normal"], target)
             print(f"git status exit={result.returncode}\n{result.stdout.strip()}")
             if result.returncode:
                 print(result.stderr.strip())

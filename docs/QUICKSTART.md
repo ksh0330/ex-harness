@@ -69,6 +69,8 @@ command -v codex
 
 P1~P7 운영·판단 질문·검증된 로컬 커밋·알고리즘/UI 확인은 설치본 `.harness/templates/START.md`와 단계별 Skill을 따른다. Git 저장소가 없으면 init 전에 묻는다. UI 직접 확인이 불가능하면 사용자 조작 안내 후 미검증으로 남긴다. 실제 검증 없이 완료/커밋하지 않는다.
 
+Builder/Reviewer의 단계별 감사·지원 확인·새 터미널 명령과 붙여넣을 프롬프트는 설치본 `.harness/templates/REVIEW.md`에 있다. Codex가 필요할 때 읽고 안내하므로 사용자에게 매 단계 Skill 호출/세션 생성을 요구하지 않는다. 최종 보고서는 `.harness/templates/FINAL_REVIEW.md`를 바탕으로 코딩 종료 전 작성한다. 후속 서술형에는 AI·복사 붙여넣기·자동 답변 입력을 사용하지 않는다.
+
 ## Clone 위치와 제출 범위
 
 기본 2명령은 과제 폴더 밖 쓰기를 요구하지 않으므로 현장 기본으로 유지한다. P7에서 실제 제출 방식과 목록/용량을 확인한다. 폴더 전체 제출은 중첩 `ex-harness/.git`도 포함할 수 있다. `.gitignore`는 전송 제외 기능이 아니다. 원본·기존 파일을 임의 삭제하지 않는다.
